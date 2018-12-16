@@ -9,21 +9,25 @@
     <item
         android:id="@+id/navigation_explore"
         android:icon="@drawable/baseline_explore_black_24dp"
-        android:title="@string/title_explore" />
+        android:title="@string/title_explore"
+        android:enabled="true"/>
 
     <item
         android:id="@+id/navigation_map"
         android:icon="@drawable/baseline_navigation_black_24dp"
-        android:title="@string/title_map" />
+        android:title="@string/title_map"
+        android:enabled="true"/>
 
     <item
         android:id="@+id/navigation_logs"
         android:icon="@drawable/baseline_list_black_24dp"
-        android:title="@string/title_logs" />
+        android:title="@string/title_logs"
+        android:enabled="true"/>
 
     <item
         android:id="@+id/navigation_settings"
         android:icon="@drawable/baseline_settings_black_24dp"
-        android:title="@string/title_settings" />
+        android:title="@string/title_settings"
+        android:enabled="true"/>
 
 </menu>

@@ -1,66 +1,77 @@
 package com.choam.polycache;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.Toast;
+import android.util.Log;
+import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = item -> {
-                switch (item.getItemId()) {
-                    case R.id.navigation_home:
-                        return true;
-                    case R.id.navigation_explore:
-                        return true;
-                    case R.id.navigation_map:
-                        startActivity(new Intent(this, MapsActivity.class));
-                        return true;
-                    case R.id.navigation_logs:
-                        return true;
-                    case R.id.navigation_settings:
-                        return true;
-                }
-                return false;
-            };
+    private ActionBar actionBar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        actionBar = getSupportActionBar();
+
+        actionBar.setTitle("Home");
+        loadFragment(new ProfileFragment());
+
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        ImageView profileImg = findViewById(R.id.ivProfile);
-        Button profileUpdate = findViewById(R.id.btnUpdate);
-
-        //This changes the image into a bitmap
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.funny_profile_pictures_imag);
-        //This takes the profile pic as a bitmap and makes it circular
-        RoundedBitmapDrawable mDrawable = RoundedBitmapDrawableFactory.create(getResources(), bitmap);
-        mDrawable.setCircular(true);
-        //Change the background color
-        //mDrawable.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.colorAccent), PorterDuff.Mode.DST_OVER);
-        //Set the img with a circle shape
-        profileImg.setImageDrawable(mDrawable);
-
-        profileUpdate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Updated!", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            Fragment fragment;
+            switch (item.getItemId()) {
+                case R.id.navigation_home:
+                    actionBar.setTitle("Profile");
+                    fragment = new ProfileFragment();
+                    loadFragment(fragment);
+                    return true;
+                case R.id.navigation_explore:
+                    actionBar.setTitle("Explore");
+                    startActivity(new Intent(getApplicationContext(), ARActivity.class));
+                    return true;
+                case R.id.navigation_map:
+                    actionBar.setTitle("Map");
+                    startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                    return true;
+                case R.id.navigation_logs:
+                    actionBar.setTitle("Logs");
+                    fragment = new LogFragment();
+                    loadFragment(fragment);
+                    return true;
+                case R.id.navigation_settings:
+                    actionBar.setTitle("Settings");
+                    fragment = new SettingsFragment();
+                    loadFragment(fragment);
+                    return true;
+            }
+            return false;
+        }
+    };
+
+    private void loadFragment(Fragment fragment) {
+        // load fragment
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.frame_container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
 
 }
