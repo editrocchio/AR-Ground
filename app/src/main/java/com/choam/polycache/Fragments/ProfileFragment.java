@@ -1,4 +1,4 @@
-package com.choam.polycache;
+package com.choam.polycache.Fragments;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.choam.polycache.R;
 
 
 public class ProfileFragment extends Fragment {
@@ -40,12 +42,8 @@ public class ProfileFragment extends Fragment {
         //Set the img with a circle shape
         profileImg.setImageDrawable(mDrawable);
 
-        profileUpdate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(view.getContext(), "Updated!", Toast.LENGTH_SHORT).show();
-            }
-        });
+        profileUpdate.setOnClickListener(view1 -> Toast.makeText(view1.getContext(),
+                "Updated!", Toast.LENGTH_SHORT).show());
 
         // Inflate the layout for this fragment
         return view;

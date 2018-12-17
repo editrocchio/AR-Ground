@@ -8,8 +8,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
+
+import com.choam.polycache.Fragments.ExploreFragment;
+import com.choam.polycache.Fragments.LogFragment;
+import com.choam.polycache.Fragments.MapsFragment;
+import com.choam.polycache.Fragments.ProfileFragment;
+import com.choam.polycache.Fragments.SettingsFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,11 +49,13 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 case R.id.navigation_explore:
                     actionBar.setTitle("Explore");
-                    startActivity(new Intent(getApplicationContext(), ARActivity.class));
+                    fragment = new ExploreFragment();
+                    loadFragment(fragment);
                     return true;
                 case R.id.navigation_map:
                     actionBar.setTitle("Map");
-                    startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                    fragment = new MapsFragment();
+                    loadFragment(fragment);
                     return true;
                 case R.id.navigation_logs:
                     actionBar.setTitle("Logs");
@@ -72,6 +79,5 @@ public class MainActivity extends AppCompatActivity {
         transaction.addToBackStack(null);
         transaction.commit();
     }
-
 
 }
