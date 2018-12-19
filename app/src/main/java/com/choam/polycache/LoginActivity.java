@@ -2,14 +2,17 @@ package com.choam.polycache;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.TextView;
+import android.widget.ImageView;
 
-import com.choam.polycache.Fragments.SignUpFragment;
+import com.bumptech.glide.Glide;
+import com.choam.polycache.Fragments.LoginFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
 
 public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -21,15 +24,13 @@ public class LoginActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        TextView signUp = findViewById(R.id.signUpTextView);
+        ImageView imageView = findViewById(R.id.gifView);
+        Glide.with(this).load("https://media.giphy.com/media/zOAAqWUPfB4iI/giphy.gif").into(imageView);
 
-        signUp.setOnClickListener(v -> {
-            Fragment fragment = new SignUpFragment();
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-          //  transaction.replace(R.id.sign_up_container, fragment);
-            transaction.addToBackStack(null);
-            transaction.commit();
-        });
+        Fragment fragment = new LoginFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.login_container, fragment);
+        transaction.commit();
 
     }
 

@@ -11,7 +11,6 @@
     <string name="title_notifications">Notifications</string>
 
     <!-- Strings related to login -->
-    <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Login</string>
     <string name="invalid_email">This email address is invalid</string>
@@ -21,6 +20,12 @@
     <string name="polycache_login">POLYCACHE</string>
     <string name="sign_up">Sign up</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="email">Email</string>
+    <string name="login">Login</string>
+    <string name="create_account">No account yet? <b>Create one</b></string>
+    <string name="name">Username</string>
+    <string name="already_a_member_login">Already a member? <b>Login</b></string>
+    <string name="create_account_signup">Create Account</string>
+    <string name="gif_description">gif</string>
+    <string name="login_title_description">Title Image</string>
 </resources>
