@@ -128,4 +128,16 @@
         android:text="Update"
         android:textColor="#ffff" />
 
+    <Button
+        android:id="@+id/logout_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/btnUpdate"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/round_button"
+        android:text="@string/logout_btn"
+        android:textColor="#ffff" />
+
 </android.support.constraint.ConstraintLayout>

@@ -1,9 +1,11 @@
 package com.choam.polycache.Fragments;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.view.LayoutInflater;
@@ -13,7 +15,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.choam.polycache.LoginActivity;
 import com.choam.polycache.R;
+import com.google.firebase.auth.FirebaseAuth;
 
 
 public class ProfileFragment extends Fragment {
@@ -31,6 +35,7 @@ public class ProfileFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         ImageView profileImg = view.findViewById(R.id.ivProfile);
         Button profileUpdate = view.findViewById(R.id.btnUpdate);
+        Button logout = view.findViewById(R.id.logout_btn);
 
         //This changes the image into a bitmap
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.funny_profile_pictures_imag);
@@ -44,6 +49,13 @@ public class ProfileFragment extends Fragment {
 
         profileUpdate.setOnClickListener(view1 -> Toast.makeText(view1.getContext(),
                 "Updated!", Toast.LENGTH_SHORT).show());
+
+        logout.setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+
+            startActivity(new Intent(v.getContext(), LoginActivity.class));
+        });
+
 
         // Inflate the layout for this fragment
         return view;

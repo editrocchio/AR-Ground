@@ -2,7 +2,6 @@ package com.choam.polycache;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -39,16 +38,9 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
-      //  updateUI(currentUser);
-     //   startActivity(new Intent(this, MainActivity.class));
-    }
-
-    public FirebaseUser getFirebaseUser() {
-        return mAuth.getCurrentUser();
-    }
-
-    public FirebaseAuth getFirebaseAuth() {
-        return mAuth;
+        if(currentUser != null) {
+            startActivity(new Intent(this, MainActivity.class));
+        }
     }
 
 }
