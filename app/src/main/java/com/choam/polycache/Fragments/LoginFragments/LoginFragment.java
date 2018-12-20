@@ -1,31 +1,29 @@
-package com.choam.polycache.Fragments;
+package com.choam.polycache.Fragments.LoginFragments;
 
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.AppCompatButton;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
+import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.choam.polycache.MainActivity;
 import com.choam.polycache.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 
@@ -33,6 +31,7 @@ public class LoginFragment extends Fragment {
     EditText email;
     EditText pass;
     AppCompatButton loginButton;
+    AppCompatButton forgotPass;
     FirebaseAuth firebaseAuth;
 
     @Override
@@ -50,6 +49,7 @@ public class LoginFragment extends Fragment {
         email = v.findViewById(R.id.input_email);
         pass = v.findViewById(R.id.input_password);
         loginButton = v.findViewById(R.id.btn_login);
+        forgotPass = v.findViewById(R.id.forgot_pass);
 
         setCreateLink(v);
 
@@ -58,6 +58,11 @@ public class LoginFragment extends Fragment {
             String passText = pass.getText().toString();
 
             signIn(emailText, passText, view);
+        });
+
+        forgotPass.setOnClickListener(v1 -> {
+            Fragment fragment = new ForgotPassFragment();
+            loadFragment(fragment);
         });
 
         return v;
@@ -70,10 +75,7 @@ public class LoginFragment extends Fragment {
             @Override
             public void onClick(@NonNull View textView) {
                 Fragment fragment = new SignUpFragment();
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.login_container, fragment);
-                transaction.addToBackStack(null);
-                transaction.commit();
+                loadFragment(fragment);
             }
             @Override
             public void updateDrawState(@NonNull TextPaint ds) {
@@ -92,6 +94,11 @@ public class LoginFragment extends Fragment {
     }
 
     public void signIn(String e, String p, View view) {
+        if(TextUtils.isEmpty(e) || TextUtils.isEmpty(p)){
+            Toast.makeText(view.getContext(),"Incorrect email/password combination",Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         firebaseAuth.signInWithEmailAndPassword(e, p)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -99,10 +106,22 @@ public class LoginFragment extends Fragment {
                     } else {
                         Toast.makeText(view.getContext(), "Incorrect email/password combination",
                                 Toast.LENGTH_SHORT).show();
+                        email.setText("");
+                        pass.setText("");
                     }
 
                 });
 
+    }
+
+    public void loadFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager.popBackStack(MainActivity.BACK_STACK_ROOT_TAG,
+                FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.login_container, fragment);
+        transaction.addToBackStack(MainActivity.BACK_STACK_ROOT_TAG);
+        transaction.commit();
     }
 
 

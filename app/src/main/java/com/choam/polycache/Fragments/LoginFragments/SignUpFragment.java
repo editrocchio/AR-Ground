@@ -1,10 +1,11 @@
-package com.choam.polycache.Fragments;
+package com.choam.polycache.Fragments.LoginFragments;
 
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.AppCompatButton;
 import android.text.SpannableString;
@@ -24,12 +25,7 @@ import android.widget.Toast;
 
 import com.choam.polycache.MainActivity;
 import com.choam.polycache.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-
-import org.w3c.dom.Text;
 
 
 public class SignUpFragment extends Fragment {
@@ -70,10 +66,7 @@ public class SignUpFragment extends Fragment {
             @Override
             public void onClick(@NonNull View textView) {
                 Fragment fragment = new LoginFragment();
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.login_container, fragment);
-                transaction.addToBackStack(null);
-                transaction.commit();
+                loadFragment(fragment);
             }
             @Override
             public void updateDrawState(@NonNull TextPaint ds) {
@@ -103,6 +96,7 @@ public class SignUpFragment extends Fragment {
             }
             if(passText.length() < 6){
                 Toast.makeText(view.getContext(),"Password must be longer than 6 characters",Toast.LENGTH_SHORT).show();
+                password.setText("");
                 return;
             }
 
@@ -116,6 +110,16 @@ public class SignUpFragment extends Fragment {
                         }
                     });
         });
+    }
+
+    public void loadFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager.popBackStack(MainActivity.BACK_STACK_ROOT_TAG,
+                FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.login_container, fragment);
+        transaction.addToBackStack(MainActivity.BACK_STACK_ROOT_TAG);
+        transaction.commit();
     }
 
 }

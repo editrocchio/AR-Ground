@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.choam.polycache.Fragments.LoginFragment;
+import com.choam.polycache.Fragments.LoginFragments.LoginFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -24,7 +24,8 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         ImageView imageView = findViewById(R.id.gifView);
-        Glide.with(this).load("https://media.giphy.com/media/zOAAqWUPfB4iI/giphy.gif").into(imageView);
+        Glide.with(this).load("https://media.giphy.com/media/TlK63EAChfDgVzEoeSk/giphy.gif").into(imageView);
+        // https://media.giphy.com/media/yoJC2Pgg7hQRuLqmcw/giphy.gif
 
         Fragment fragment = new LoginFragment();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -42,5 +43,6 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(new Intent(this, MainActivity.class));
         }
     }
+
 
 }
