@@ -2,20 +2,18 @@ package com.choam.polycache;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.GuardedBy;
+
+import com.choam.polycache.GoogleClasses.ResolveDialogFragment;
+import com.choam.polycache.GoogleClasses.StorageManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
-
-
+import com.choam.polycache.GoogleClasses.SnackbarHelper;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
-import com.google.ar.core.Session;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.rendering.ModelRenderable;
@@ -33,11 +31,14 @@ public class ARActivity extends AppCompatActivity {
     private enum AppAnchorState {
         NONE,
         HOSTING,
-        HOSTED
+        HOSTED,
+        RESOLVING,
+        RESOLVED
     }
 
-    @GuardedBy("singleTapAnchorLock")
     private AppAnchorState appAnchorState = AppAnchorState.NONE;
+    private SnackbarHelper snackbarHelper = new SnackbarHelper();
+    private StorageManager storageManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,30 +47,53 @@ public class ARActivity extends AppCompatActivity {
 
         fragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
         fragment.getArSceneView().getScene().addOnUpdateListener(this::onUpdateFrame);
-        //hide plane dicovery controller to disable the hand gesture
         fragment.getPlaneDiscoveryController().hide();
 
         Button clearButton = findViewById(R.id.clear_button);
-        //Set cloud anchor to null when we click clear.
-        clearButton.setOnClickListener(view -> setCloudAnchor(null));
+        clearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setCloudAnchor(null);
+            }
+        });
+
+        Button resolveButton = findViewById(R.id.resolve_button);
+        resolveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (cloudAnchor != null){
+                    snackbarHelper.showMessageWithDismiss(getParent(), "Please clear Anchor");
+                    return;
+                }
+                ResolveDialogFragment dialog = new ResolveDialogFragment();
+                dialog.setOkListener(ARActivity.this::onResolveOkPressed);
+                dialog.show(getSupportFragmentManager(), "Resolve");
+
+            }
+        });
 
         fragment.setOnTapArPlaneListener(
                 (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
 
                     if (plane.getType() != Plane.Type.HORIZONTAL_UPWARD_FACING ||
-                            appAnchorState != AppAnchorState.NONE){
+                            appAnchorState != AppAnchorState.NONE) {
                         return;
                     }
-                    //Start hosting and change state.
+
                     Anchor newAnchor = fragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor());
+
                     setCloudAnchor(newAnchor);
+
                     appAnchorState = AppAnchorState.HOSTING;
-                    Toast.makeText(this, "Hosting!", Toast.LENGTH_SHORT).show();
-                    Log.d("ArActivity", "hosting..");
+                    snackbarHelper.showMessage(this, "Now hosting anchor...");
+
+
                     placeObject(fragment, cloudAnchor, Uri.parse("model.sfb"));
 
                 }
         );
+
+        storageManager = new StorageManager(this);
     }
 
     //Ensures there's only one cloud anchor at a time.
@@ -80,8 +104,8 @@ public class ARActivity extends AppCompatActivity {
 
         cloudAnchor = newAnchor;
         appAnchorState = AppAnchorState.NONE;
+        snackbarHelper.hide(this);
     }
-
 
 
     /**
@@ -107,6 +131,7 @@ public class ARActivity extends AppCompatActivity {
                 }));
 
     }
+
 
     /**
      * @param fragment our fragment
@@ -136,22 +161,57 @@ public class ARActivity extends AppCompatActivity {
     }
 
     private synchronized void checkUpdatedAnchor(){
-        if (appAnchorState != AppAnchorState.HOSTING){
+        if (appAnchorState != AppAnchorState.HOSTING && appAnchorState != AppAnchorState.RESOLVING){
             return;
         }
         Anchor.CloudAnchorState cloudState = cloudAnchor.getCloudAnchorState();
-
         if (appAnchorState == AppAnchorState.HOSTING) {
             if (cloudState.isError()) {
-                Toast.makeText(this, "Error hosting anchor.", Toast.LENGTH_SHORT).show();
-                Log.d("ArActivity", "error");
+                snackbarHelper.showMessageWithDismiss(this, "Error hosting anchor.. "
+                        + cloudState);
                 appAnchorState = AppAnchorState.NONE;
             } else if (cloudState == Anchor.CloudAnchorState.SUCCESS) {
-                Toast.makeText(this, "Anchor hosted with ID " + cloudAnchor.getCloudAnchorId(), Toast.LENGTH_SHORT).show();
-                Log.d("ArActivity", "success");
+                storageManager.nextShortCode((shortCode) -> {
+                    if (shortCode == null){
+                        snackbarHelper.showMessageWithDismiss(this, "Could not get shortCode");
+                        return;
+                    }
+                    storageManager.storeUsingShortCode(shortCode, cloudAnchor.getCloudAnchorId());
+
+                    snackbarHelper.showMessageWithDismiss(this, "Anchor hosted! Cloud Short Code: " +
+                            shortCode);
+                });
+
                 appAnchorState = AppAnchorState.HOSTED;
             }
         }
+
+        else if (appAnchorState == AppAnchorState.RESOLVING){
+            if (cloudState.isError()) {
+                snackbarHelper.showMessageWithDismiss(this, "Error resolving anchor.. "
+                        + cloudState);
+                appAnchorState = AppAnchorState.NONE;
+            } else if (cloudState == Anchor.CloudAnchorState.SUCCESS){
+                snackbarHelper.showMessageWithDismiss(this, "Anchor resolved successfully");
+                appAnchorState = AppAnchorState.RESOLVED;
+            }
+        }
+
     }
+
+    /*This function takes the shortCode as the input, retrieves the resolved anchor, and places
+      our 3D object on the Resolved Anchor. It changes the appAnchorState to RESOLVING
+    */
+    private void onResolveOkPressed(String dialogValue){
+        int shortCode = Integer.parseInt(dialogValue);
+        storageManager.getCloudAnchorID(shortCode,(cloudAnchorId) -> {
+            Anchor resolvedAnchor = fragment.getArSceneView().getSession().resolveCloudAnchor(cloudAnchorId);
+            setCloudAnchor(resolvedAnchor);
+            placeObject(fragment, cloudAnchor, Uri.parse("model.sfb"));
+            snackbarHelper.showMessage(this, "Now Resolving Anchor...");
+            appAnchorState = AppAnchorState.RESOLVING;
+        });
+    }
+
 
 }
