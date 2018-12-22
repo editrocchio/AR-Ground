@@ -68,3 +68,6 @@ fastlane/readme.md
 #models
 sampledata/
 assets/
+
+#Firebase credentials
+.app/google-services.json

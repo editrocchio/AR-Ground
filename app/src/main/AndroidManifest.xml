@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.choam.polycache">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.CAMERA" />
     <!--
      Indicates that app requires ARCore ("AR Required"). Ensures app is only
@@ -27,12 +28,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ARActivity" />
         <activity android:name=".MainActivity" />
-
+        <activity android:name=".ARActivity" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/api_key" />
+            android:value="@string/api_key_map" />
+
+        <meta-data
+            android:name="com.google.android.ar.API_KEY"
+            android:value="@string/api_key_map"/>
 
         <uses-library
             android:name="org.apache.http.legacy"

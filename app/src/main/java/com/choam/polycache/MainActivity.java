@@ -20,8 +20,6 @@ public class MainActivity extends AppCompatActivity {
     public static final String BACK_STACK_ROOT_TAG = "root_fragment";
     private ActionBar actionBar;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

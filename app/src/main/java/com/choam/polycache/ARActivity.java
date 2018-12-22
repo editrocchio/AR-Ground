@@ -2,140 +2,87 @@ package com.choam.polycache;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+import android.support.annotation.GuardedBy;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 
 import com.google.ar.core.Anchor;
-import com.google.ar.core.Frame;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
-import com.google.ar.core.Point;
-import com.google.ar.core.Trackable;
-import com.google.ar.core.TrackingState;
+import com.google.ar.core.Session;
 import com.google.ar.sceneform.AnchorNode;
+import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.rendering.ModelRenderable;
+import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
-
-import java.util.List;
 
 
 public class ARActivity extends AppCompatActivity {
 
-    private ArFragment arFragment;
+    private CustomArFragment fragment;
+    private Anchor cloudAnchor;
 
-    private boolean isTracking = false;
-    private boolean isHitting = false;
+    //NONE by default, HOSTING when hosting the Anchor and HOSTED when the anchor is done hosting.
+    private enum AppAnchorState {
+        NONE,
+        HOSTING,
+        HOSTED
+    }
 
-    private FloatingActionButton floatingActionButton;
+    @GuardedBy("singleTapAnchorLock")
+    private AppAnchorState appAnchorState = AppAnchorState.NONE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ar);
 
-        arFragment = (ArFragment)
-                getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
+        fragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
+        fragment.getArSceneView().getScene().addOnUpdateListener(this::onUpdateFrame);
+        //hide plane dicovery controller to disable the hand gesture
+        fragment.getPlaneDiscoveryController().hide();
 
-        floatingActionButton = findViewById(R.id.floatingActionButton);
+        Button clearButton = findViewById(R.id.clear_button);
+        //Set cloud anchor to null when we click clear.
+        clearButton.setOnClickListener(view -> setCloudAnchor(null));
 
-        // Adds a listener to the ARSceneView
-        // Called before processing each frame
-        arFragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
-            arFragment.onUpdate(frameTime);
-            onUpdate();
-        });
+        fragment.setOnTapArPlaneListener(
+                (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
 
-        // Set the onclick lister for fab
-        floatingActionButton.setOnClickListener(v -> {
-            addObject(Uri.parse("model.sfb"));
-        });
-    }
+                    if (plane.getType() != Plane.Type.HORIZONTAL_UPWARD_FACING ||
+                            appAnchorState != AppAnchorState.NONE){
+                        return;
+                    }
+                    //Start hosting and change state.
+                    Anchor newAnchor = fragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor());
+                    setCloudAnchor(newAnchor);
+                    appAnchorState = AppAnchorState.HOSTING;
+                    Toast.makeText(this, "Hosting!", Toast.LENGTH_SHORT).show();
+                    Log.d("ArActivity", "hosting..");
+                    placeObject(fragment, cloudAnchor, Uri.parse("model.sfb"));
 
-    //Show/hide fab
-    private void showFab(boolean enabled) {
-        if (enabled) {
-            floatingActionButton.setEnabled(true);
-            floatingActionButton.setVisibility(View.VISIBLE);
-        } else {
-            floatingActionButton.setEnabled(false);
-            floatingActionButton.setVisibility(View.GONE);
-        }
-    }
-
-    // Updates the tracking state
-    private void onUpdate() {
-        updateTracking();
-        // Check if the devices gaze is hitting a plane detected by ARCore
-        if (isTracking) {
-            if(updateHitTest()) {
-                showFab(isHitting);
-            }
-        }
-    }
-
-    // Performs frame.HitTest and returns if a hit is detected
-    private boolean updateHitTest() {
-        Frame frame = arFragment.getArSceneView().getArFrame();
-        android.graphics.Point point = getScreenCenter();
-        List<HitResult> hits;
-        boolean wasHitting = isHitting;
-        isHitting = false;
-
-        if(frame != null) {
-            hits = frame.hitTest(point.x, point.y);
-            for (HitResult hit : hits) {
-                Trackable trackable = hit.getTrackable();
-                if (trackable instanceof Plane &&
-                        ((Plane) trackable).isPoseInPolygon(hit.getHitPose())) {
-                    isHitting = true;
-                    break;
                 }
-            }
+        );
+    }
+
+    //Ensures there's only one cloud anchor at a time.
+    private void setCloudAnchor (Anchor newAnchor){
+        if (cloudAnchor != null){
+            cloudAnchor.detach();
         }
 
-        return wasHitting != isHitting;
+        cloudAnchor = newAnchor;
+        appAnchorState = AppAnchorState.NONE;
     }
 
-    // Makes use of ARCore's camera state and returns true if the tracking state has changed
-    private boolean updateTracking() {
-        Frame frame = arFragment.getArSceneView().getArFrame();
-        boolean wasTracking = isTracking;
-        isTracking = isTracking = frame != null &&
-                frame.getCamera().getTrackingState() == TrackingState.TRACKING;
 
-        return isTracking != wasTracking;
-    }
-
-    //Returns the center of the screen
-    private android.graphics.Point getScreenCenter() {
-        View view = findViewById(android.R.id.content);
-        return new android.graphics.Point(view.getWidth() / 2, view.getHeight() / 2);
-    }
-
-    /**
-     * takes in our 3D model and performs a hit test to determine where to place it
-     * @param model Uri of of 3d sfb file.
-     */
-    private void addObject(Uri model) {
-        Frame frame = arFragment.getArSceneView().getArFrame();
-        android.graphics.Point point = getScreenCenter();
-
-        if (frame != null) {
-            List<HitResult> hits = frame.hitTest(point.x, point.y);
-            for (HitResult hit : hits) {
-                Trackable trackable = hit.getTrackable();
-                if (trackable instanceof Plane &&
-                        ((Plane) trackable).isPoseInPolygon(hit.getHitPose())) {
-                    placeObject(arFragment, hit.createAnchor(), model);
-                    break;
-                }
-            }
-        }
-    }
 
     /**
      * @param fragment our fragment
@@ -153,11 +100,12 @@ public class ARActivity extends AppCompatActivity {
                 .exceptionally((throwable -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setMessage(throwable.getMessage())
-                            .setTitle("Codelab error!");
+                            .setTitle("Error!");
                     AlertDialog dialog = builder.create();
                     dialog.show();
                     return null;
                 }));
+
     }
 
     /**
@@ -170,13 +118,40 @@ public class ARActivity extends AppCompatActivity {
      * The Transformable node is our Model
      * Once the nodes are connected we select the TransformableNode so it is available for interactions
      */
-    private void addNodeToScene(ArFragment fragment, Anchor anchor, ModelRenderable renderable) {
-        TransformableNode node = new TransformableNode(fragment.getTransformationSystem());
+    private void addNodeToScene(ArFragment fragment, Anchor anchor, Renderable renderable) {
         AnchorNode anchorNode = new AnchorNode(anchor);
+        TransformableNode node = new TransformableNode(fragment.getTransformationSystem());
         node.setRenderable(renderable);
         node.setParent(anchorNode);
         fragment.getArSceneView().getScene().addChild(anchorNode);
         node.select();
+    }
+
+    /*Check if the anchor has finished hosting every time a frame is updated. To do this, we can
+      create a function onUpdateFrame. This function will call another function checkUpdatedAnchor
+      which will check the state of the anchor and update appAnchorState.
+    */
+    private void onUpdateFrame(FrameTime frameTime){
+        checkUpdatedAnchor();
+    }
+
+    private synchronized void checkUpdatedAnchor(){
+        if (appAnchorState != AppAnchorState.HOSTING){
+            return;
+        }
+        Anchor.CloudAnchorState cloudState = cloudAnchor.getCloudAnchorState();
+
+        if (appAnchorState == AppAnchorState.HOSTING) {
+            if (cloudState.isError()) {
+                Toast.makeText(this, "Error hosting anchor.", Toast.LENGTH_SHORT).show();
+                Log.d("ArActivity", "error");
+                appAnchorState = AppAnchorState.NONE;
+            } else if (cloudState == Anchor.CloudAnchorState.SUCCESS) {
+                Toast.makeText(this, "Anchor hosted with ID " + cloudAnchor.getCloudAnchorId(), Toast.LENGTH_SHORT).show();
+                Log.d("ArActivity", "success");
+                appAnchorState = AppAnchorState.HOSTED;
+            }
+        }
     }
 
 }

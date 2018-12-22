@@ -15,7 +15,7 @@ android {
     buildTypes {
         debug {
             buildConfigField 'String', "ApiKeyDebug", PolyCache_MapsAPIKey
-            resValue 'string', "api_key", PolyCache_MapsAPIKey
+            resValue 'string', "api_key_map", PolyCache_MapsAPIKey
         }
         release {
             minifyEnabled false
