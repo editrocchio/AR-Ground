@@ -13,9 +13,9 @@
         android:enabled="true"/>
 
     <item
-        android:id="@+id/navigation_map"
+        android:id="@+id/navigation_create"
         android:icon="@drawable/baseline_navigation_black_24dp"
-        android:title="@string/title_map"
+        android:title="Create"
         android:enabled="true"/>
 
     <item

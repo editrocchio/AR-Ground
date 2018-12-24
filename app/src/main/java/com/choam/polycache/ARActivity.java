@@ -46,30 +46,26 @@ public class ARActivity extends AppCompatActivity {
         setContentView(R.layout.activity_ar);
 
         fragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
-        fragment.getArSceneView().getScene().addOnUpdateListener(this::onUpdateFrame);
+        fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
+            fragment.onUpdate(frameTime);
+            onUpdateFrame();
+        });
+
         fragment.getPlaneDiscoveryController().hide();
 
         Button clearButton = findViewById(R.id.clear_button);
-        clearButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setCloudAnchor(null);
-            }
-        });
+        clearButton.setOnClickListener(view -> setCloudAnchor(null));
 
         Button resolveButton = findViewById(R.id.resolve_button);
-        resolveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (cloudAnchor != null){
-                    snackbarHelper.showMessageWithDismiss(getParent(), "Please clear Anchor");
-                    return;
-                }
-                ResolveDialogFragment dialog = new ResolveDialogFragment();
-                dialog.setOkListener(ARActivity.this::onResolveOkPressed);
-                dialog.show(getSupportFragmentManager(), "Resolve");
-
+        resolveButton.setOnClickListener(view -> {
+            if (cloudAnchor != null){
+                snackbarHelper.showMessageWithDismiss(getParent(), "Please clear Anchor");
+                return;
             }
+            ResolveDialogFragment dialog = new ResolveDialogFragment();
+            dialog.setOkListener(ARActivity.this::onResolveOkPressed);
+            dialog.show(getSupportFragmentManager(), "Resolve");
+
         });
 
         fragment.setOnTapArPlaneListener(
@@ -156,7 +152,7 @@ public class ARActivity extends AppCompatActivity {
       create a function onUpdateFrame. This function will call another function checkUpdatedAnchor
       which will check the state of the anchor and update appAnchorState.
     */
-    private void onUpdateFrame(FrameTime frameTime){
+    private void onUpdateFrame(){
         checkUpdatedAnchor();
     }
 

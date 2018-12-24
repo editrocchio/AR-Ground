@@ -9,6 +9,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+import com.choam.polycache.Fragments.CreateFragment;
 import com.choam.polycache.Fragments.ExploreFragment;
 import com.choam.polycache.Fragments.LogFragment;
 import com.choam.polycache.Fragments.MapsFragment;
@@ -51,9 +52,9 @@ public class MainActivity extends AppCompatActivity {
                     fragment = new ExploreFragment();
                     loadFragment(fragment);
                     return true;
-                case R.id.navigation_map:
-                    actionBar.setTitle("Map");
-                    fragment = new MapsFragment();
+                case R.id.navigation_create:
+                    actionBar.setTitle("Create");
+                    fragment = new CreateFragment();
                     loadFragment(fragment);
                     return true;
                 case R.id.navigation_logs:

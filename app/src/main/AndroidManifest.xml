@@ -32,11 +32,11 @@
         <activity android:name=".ARActivity" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/api_key_map" />
+            android:value="@string/api_key" />
 
         <meta-data
             android:name="com.google.android.ar.API_KEY"
-            android:value="@string/api_key_map"/>
+            android:value="@string/api_key"/>
 
         <uses-library
             android:name="org.apache.http.legacy"

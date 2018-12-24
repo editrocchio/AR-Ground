@@ -3,6 +3,7 @@ package com.choam.polycache.Fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,9 +21,16 @@ public class ExploreFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_explore, container, false);
         Button btn = view.findViewById(R.id.btnCamera);
+        Button map = view.findViewById(R.id.btnMap);
 
         btn.setOnClickListener(v -> startActivity(new Intent(view.getContext(), ARActivity.class)));
-        // Inflate the layout for this fragment
+        map.setOnClickListener(v -> {
+            Fragment fragment = new MapsFragment();
+            FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.frame_container, fragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
+        });
         return view;
     }
 
