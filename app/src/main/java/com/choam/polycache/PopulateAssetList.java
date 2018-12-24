@@ -1,0 +1,24 @@
+package com.choam.polycache;
+
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+
+import java.util.ArrayList;
+
+
+public class PopulateAssetList extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.rv_list);
+
+        RecyclerView rvAssets = findViewById(R.id.rvAssets);
+
+        AssetAdapter assetAdapter = new AssetAdapter(PolyObject.getPolyObjects());
+        rvAssets.setLayoutManager(new LinearLayoutManager(this));
+        rvAssets.setAdapter(assetAdapter);
+    }
+}
