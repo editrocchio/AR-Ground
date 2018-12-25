@@ -6,10 +6,11 @@ public class PolyObject {
     private String name;
     private String authorName;
     private String assetURL;
+    private String thumbURL;
 
     private static ArrayList<PolyObject> polyObjects = new ArrayList<>();
 
-    public PolyObject(String name, String authorName, String assetURL) {
+    public PolyObject(String name, String authorName, String assetURL, String thumbURL) {
         if(name != null && !name.isEmpty()) {
             this.name = name;
         }
@@ -18,6 +19,9 @@ public class PolyObject {
         }
         if(assetURL != null && !assetURL.isEmpty()) {
             this.assetURL = assetURL;
+        }
+        if(thumbURL != null && !thumbURL.isEmpty()) {
+            this.thumbURL = thumbURL;
         }
     }
 
@@ -31,6 +35,10 @@ public class PolyObject {
 
     public String getAssetURL() {
         return assetURL;
+    }
+
+    public String getThumbURL() {
+        return thumbURL;
     }
 
     public static void addToPolyObjectList(PolyObject polyObject) {

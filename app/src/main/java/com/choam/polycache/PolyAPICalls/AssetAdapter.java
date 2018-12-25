@@ -1,6 +1,7 @@
 package com.choam.polycache.PolyAPICalls;
 
 import android.content.Context;
+import android.media.Image;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -9,8 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestOptions;
 import com.choam.polycache.Fragments.CreateFragment;
 import com.choam.polycache.R;
 
@@ -32,6 +37,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
 
     // Store a member variable for the contacts
     private List<PolyObject> polyObjects;
+    private Context context;
 
     public AssetAdapter(List<PolyObject> polyObjects) {
         this.polyObjects = polyObjects;
@@ -42,7 +48,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
     @NonNull
     @Override
     public AssetAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        Context context = viewGroup.getContext();
+        context = viewGroup.getContext();
         LayoutInflater layoutInflater = LayoutInflater.from(context);
 
         View assetView = layoutInflater.inflate(R.layout.item_asset, viewGroup, false);
@@ -57,14 +63,22 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
 
         // Set item views based on your views and data model
         TextView textView = viewHolder.nameTextView;
-        textView.setText(polyObject.getName());
+        textView.setText(polyObject.getName() +  "\nAuthor: " + polyObject.getAuthorName());
         Button chooseButton = viewHolder.chooseButton;
-        Button viewButton = viewHolder.viewButton;
+        ImageView assetPreview = viewHolder.assetPreview;
 
-        viewButton.setOnClickListener(v -> {
-            GetAssetTask getAssetTask = new GetAssetTask();
-            getAssetTask.execute(polyObject.getAssetURL());
-        });
+        Glide.with(context)
+                .load(polyObject.getThumbURL())
+                .transition(new DrawableTransitionOptions()
+                    .crossFade())
+                .apply(new RequestOptions()
+                        .placeholder(R.mipmap.ic_launcher)
+                .error(R.drawable.baseline_explore_black_24dp))
+                .into(assetPreview);
+
+        GetAssetTask getAssetTask = new GetAssetTask();
+        getAssetTask.execute(polyObject.getAssetURL());
+
     }
 
     // Returns the total count of items in the list
@@ -80,7 +94,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
         // for any view that will be set as you render a row
         private TextView nameTextView;
         private Button chooseButton;
-        private Button viewButton;
+        private ImageView assetPreview;
 
         // We also create a constructor that accepts the entire item row
         // and does the view lookups to find each subview
@@ -91,7 +105,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
 
             nameTextView = itemView.findViewById(R.id.asset_name);
             chooseButton = itemView.findViewById(R.id.choose_button);
-            viewButton = itemView.findViewById(R.id.view_button);
+            assetPreview = itemView.findViewById(R.id.asset_preview);
         }
 
     }
@@ -116,7 +130,6 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
 
             try {
                 Response response = httpClient.newCall(request).execute();
-                Log.d(TAG, response.body().string());
                 return response.body().string();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -127,6 +140,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
         @Override
         protected void onPostExecute(String result) {
             try {
+            //    Log.d(TAG, result);
                 JSONObject res = new JSONObject(result);
                 formats = res.getJSONArray("formats");
             } catch (JSONException e) {

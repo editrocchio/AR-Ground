@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -14,14 +15,12 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"/>
 
-    <Button
-        android:id="@+id/view_button"
-        android:layout_width="wrap_content"
+    <ImageView
+        android:id="@+id/asset_preview"
+        tools:ignore="ContentDescription"
+        android:layout_marginEnd="5dp"
         android:layout_height="wrap_content"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:text="View"
-        android:textSize="12sp" />
+        android:layout_width="wrap_content" />
 
     <Button
         android:id="@+id/choose_button"
@@ -31,4 +30,5 @@
         android:paddingRight="16dp"
         android:text="Select"
         android:textSize="12sp" />
+
 </LinearLayout>

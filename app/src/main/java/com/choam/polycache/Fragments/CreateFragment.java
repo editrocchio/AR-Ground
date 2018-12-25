@@ -64,7 +64,6 @@ public class CreateFragment extends Fragment  {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedCategory = parent.getItemAtPosition(position).toString();
-                Log.d(TAG, selectedCategory);
             }
 
             @Override
@@ -137,7 +136,7 @@ public class CreateFragment extends Fragment  {
         protected void onPostExecute(String result) {
             View v = view.get();
             Context c = context.get();
-
+        //    Log.d(TAG, result);
             PolyObject.getPolyObjects().clear();
             try {
                 JSONObject res = new JSONObject(result);
@@ -151,8 +150,9 @@ public class CreateFragment extends Fragment  {
                     String name = assets.getJSONObject(i).getString("displayName");
                     String authorName = assets.getJSONObject(i).getString("authorName");
                     String assetURL = BASE_URL + assets.getJSONObject(i).getString("name");
+                    String thumbURL = assets.getJSONObject(i).getJSONObject("thumbnail").getString("url");
 
-                    PolyObject.addToPolyObjectList(new PolyObject(name, authorName, assetURL));
+                    PolyObject.addToPolyObjectList(new PolyObject(name, authorName, assetURL, thumbURL));
 
                 }
 
