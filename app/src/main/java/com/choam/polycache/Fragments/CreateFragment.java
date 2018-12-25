@@ -36,8 +36,8 @@ import okhttp3.Response;
 
 public class CreateFragment extends Fragment  {
 
-    private static final String API_KEY = BuildConfig.ApiKeyDebugPoly;
-    private static final String BASE_URL = "https://poly.googleapis.com/v1";
+    public static final String API_KEY = BuildConfig.ApiKeyDebugPoly;
+    public static final String BASE_URL = "https://poly.googleapis.com/v1/";
     private static final String TAG = "CreateFragment";
     private ReceiveFeedTask receiveFeedTask;
     private EditText catEditTxt;
@@ -82,7 +82,6 @@ public class CreateFragment extends Fragment  {
         return view;
     }
 
-
     private static class ReceiveFeedTask extends AsyncTask<String, Void, String> {
         private WeakReference<Context> context;
         private WeakReference<View> view;
@@ -96,7 +95,7 @@ public class CreateFragment extends Fragment  {
         @Override
         protected String doInBackground(String... params) {
             OkHttpClient httpClient = new OkHttpClient();
-            String url =  BASE_URL + "/assets/";
+            String url =  BASE_URL + "assets/";
 
             HttpUrl.Builder httpBuilder = HttpUrl.parse(url).newBuilder();
 
@@ -151,7 +150,7 @@ public class CreateFragment extends Fragment  {
                 for(int i=0; i<assets.length(); i++) {
                     String name = assets.getJSONObject(i).getString("displayName");
                     String authorName = assets.getJSONObject(i).getString("authorName");
-                    String assetURL = assets.getJSONObject(i).getString("name");
+                    String assetURL = BASE_URL + assets.getJSONObject(i).getString("name");
 
                     PolyObject.addToPolyObjectList(new PolyObject(name, authorName, assetURL));
 
@@ -160,7 +159,7 @@ public class CreateFragment extends Fragment  {
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (NullPointerException n) {
-                Toast.makeText(c, "Category doesn't exist", Toast.LENGTH_SHORT).show();
+                Toast.makeText(c, "Nothing found", Toast.LENGTH_SHORT).show();
             }
 
             if(PolyObject.getPolyObjects().size() > 0) {

@@ -15,10 +15,20 @@
         android:layout_weight="1"/>
 
     <Button
+        android:id="@+id/view_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:text="View"
+        android:textSize="12sp" />
+
+    <Button
         android:id="@+id/choose_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:textSize="10sp" />
+        android:text="Select"
+        android:textSize="12sp" />
 </LinearLayout>
