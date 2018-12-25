@@ -1,4 +1,4 @@
-package com.choam.polycache;
+package com.choam.polycache.PolyAPICalls;
 
 import java.util.ArrayList;
 
@@ -38,7 +38,7 @@ public class PolyObject {
     }
 
     public static ArrayList<PolyObject> getPolyObjects() {
-        return  polyObjects;
+        return polyObjects;
     }
 
 }

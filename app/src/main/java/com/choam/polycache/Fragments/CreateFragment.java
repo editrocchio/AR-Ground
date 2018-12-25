@@ -6,43 +6,42 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.choam.polycache.AssetAdapter;
 import com.choam.polycache.BuildConfig;
-import com.choam.polycache.PolyObject;
-import com.choam.polycache.PopulateAssetList;
+import com.choam.polycache.PolyAPICalls.PolyObject;
+import com.choam.polycache.PolyAPICalls.PopulateAssetList;
 import com.choam.polycache.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Console;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class CreateFragment extends Fragment {
+public class CreateFragment extends Fragment  {
 
     private static final String API_KEY = BuildConfig.ApiKeyDebugPoly;
     private static final String BASE_URL = "https://poly.googleapis.com/v1";
     private static final String TAG = "CreateFragment";
     private ReceiveFeedTask receiveFeedTask;
     private EditText catEditTxt;
+    private static String selectedCategory;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,19 +50,38 @@ public class CreateFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_create, container, false);
 
         Button send = view.findViewById(R.id.btnSend);
-        catEditTxt = view.findViewById(R.id.category);
+        catEditTxt = view.findViewById(R.id.search_assets);
+        Spinner spinner = view.findViewById(R.id.category_spinner);
+        selectedCategory = "";
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(view.getContext(),
+                R.array.categories_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedCategory = parent.getItemAtPosition(position).toString();
+                Log.d(TAG, selectedCategory);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                selectedCategory = "";
+            }
+        });
 
         send.setOnClickListener(v -> {
-            if(catEditTxt.getText() != null && !catEditTxt.getText().toString().isEmpty()) {
-                receiveFeedTask = new ReceiveFeedTask(view.getContext(), view);
-                receiveFeedTask.execute(catEditTxt.getText().toString());
-
-            }
+            receiveFeedTask = new ReceiveFeedTask(view.getContext(), view);
+            receiveFeedTask.execute(catEditTxt.getText().toString());
         });
 
 
         return view;
     }
+
 
     private static class ReceiveFeedTask extends AsyncTask<String, Void, String> {
         private WeakReference<Context> context;
@@ -81,9 +99,28 @@ public class CreateFragment extends Fragment {
             String url =  BASE_URL + "/assets/";
 
             HttpUrl.Builder httpBuilder = HttpUrl.parse(url).newBuilder();
-            httpBuilder.addQueryParameter("key", API_KEY);
-            httpBuilder.addQueryParameter("category", params[0]);
-            httpBuilder.addQueryParameter("format", "OBJ");
+
+            //If the cat is all and they put a search term.
+            if(selectedCategory.toLowerCase().equals("all") && params[0] != null && !params[0].isEmpty()) {
+                httpBuilder.addQueryParameter("key", API_KEY);
+                httpBuilder.addQueryParameter("keywords", params[0].toLowerCase());
+                httpBuilder.addQueryParameter("format", "OBJ");
+              //if they choose a cat and enter a search term
+            } else if(!selectedCategory.toLowerCase().equals("all") && params[0] != null && !params[0].isEmpty()){
+                httpBuilder.addQueryParameter("key", API_KEY);
+                httpBuilder.addQueryParameter("category", selectedCategory.toLowerCase());
+                httpBuilder.addQueryParameter("keywords", params[0].toLowerCase());
+                httpBuilder.addQueryParameter("format", "OBJ");
+              //if they chose a cat but left the search box empty
+            } else if(!selectedCategory.toLowerCase().equals("all") && (params[0] == null || params[0].isEmpty())) {
+                httpBuilder.addQueryParameter("key", API_KEY);
+                httpBuilder.addQueryParameter("category", selectedCategory.toLowerCase());
+                httpBuilder.addQueryParameter("format", "OBJ");
+              //if the cat is all and they didn't enter a search term
+            } else if(selectedCategory.toLowerCase().equals("all") && (params[0] == null || params[0].isEmpty())) {
+                httpBuilder.addQueryParameter("key", API_KEY);
+                httpBuilder.addQueryParameter("format", "OBJ");
+            }
 
             Request request = new Request.Builder().url(httpBuilder.build()).build();
 
@@ -99,6 +136,9 @@ public class CreateFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String result) {
+            View v = view.get();
+            Context c = context.get();
+
             PolyObject.getPolyObjects().clear();
             try {
                 JSONObject res = new JSONObject(result);
@@ -115,21 +155,17 @@ public class CreateFragment extends Fragment {
 
                     PolyObject.addToPolyObjectList(new PolyObject(name, authorName, assetURL));
 
-
-                    Log.d(TAG, "ID: " + assets.getJSONObject(i).getString("name") + "\n" +
-                            "DISPLAY NAME: " + assets.getJSONObject(i).getString("displayName") + "\n");
                 }
 
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (NullPointerException n) {
-                Log.d(TAG, "doesn't exist");
+                Toast.makeText(c, "Category doesn't exist", Toast.LENGTH_SHORT).show();
             }
 
-            View v = view.get();
-            Context c = context.get();
-
-            v.getContext().startActivity(new Intent(c, PopulateAssetList.class));
+            if(PolyObject.getPolyObjects().size() > 0) {
+                v.getContext().startActivity(new Intent(c, PopulateAssetList.class));
+            }
 
         }
 

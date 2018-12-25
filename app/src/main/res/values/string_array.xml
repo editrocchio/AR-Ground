@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="categories_array">
+        <item>All</item>
+        <item>Animals</item>
+        <item>Architecture</item>
+        <item>Art</item>
+        <item>Food</item>
+        <item>Nature</item>
+        <item>Objects</item>
+        <item>People</item>
+        <item>Scenes</item>
+        <item>Technology</item>
+        <item>Transport</item>
+    </string-array>
+</resources>

@@ -68,8 +68,12 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.12.0'
 }
 
-
 sceneform.asset('sampledata/dharma/model.obj',
         'default',
         'sampledata/dharma/model.sfa',
         'src/main/assets/model')
+
+sceneform.asset('sampledata/monster/monster.obj',
+        'default',
+        'sampledata/monster/monster.sfa',
+        'src/main/assets/monster')

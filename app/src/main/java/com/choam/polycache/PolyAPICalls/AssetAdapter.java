@@ -1,14 +1,15 @@
-package com.choam.polycache;
+package com.choam.polycache.PolyAPICalls;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.choam.polycache.R;
 
 import java.util.List;
 

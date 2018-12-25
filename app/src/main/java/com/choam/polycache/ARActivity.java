@@ -8,14 +8,12 @@ import com.choam.polycache.GoogleClasses.StorageManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.Button;
 import com.choam.polycache.GoogleClasses.SnackbarHelper;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
 import com.google.ar.sceneform.AnchorNode;
-import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
@@ -84,7 +82,7 @@ public class ARActivity extends AppCompatActivity {
                     snackbarHelper.showMessage(this, "Now hosting anchor...");
 
 
-                    placeObject(fragment, cloudAnchor, Uri.parse("model.sfb"));
+                    placeObject(fragment, cloudAnchor, Uri.parse("monster.sfb"));
 
                 }
         );
@@ -203,7 +201,7 @@ public class ARActivity extends AppCompatActivity {
         storageManager.getCloudAnchorID(shortCode,(cloudAnchorId) -> {
             Anchor resolvedAnchor = fragment.getArSceneView().getSession().resolveCloudAnchor(cloudAnchorId);
             setCloudAnchor(resolvedAnchor);
-            placeObject(fragment, cloudAnchor, Uri.parse("model.sfb"));
+            placeObject(fragment, cloudAnchor, Uri.parse("monster.sfb"));
             snackbarHelper.showMessage(this, "Now Resolving Anchor...");
             appAnchorState = AppAnchorState.RESOLVING;
         });
