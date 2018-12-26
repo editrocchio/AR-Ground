@@ -1,9 +1,19 @@
 package com.choam.polycache.PolyAPICalls;
 
+import android.Manifest;
+import android.app.Activity;
+import android.app.DownloadManager;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.media.Image;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,7 +33,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 import okhttp3.HttpUrl;
@@ -35,12 +47,29 @@ import okhttp3.Response;
 // Note that we specify the custom ViewHolder which gives us access to our views
 public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> {
 
-    // Store a member variable for the contacts
+
     private List<PolyObject> polyObjects;
     private Context context;
 
+    private static String objFileUrl;
+    private static String mtlFileUrl;
+    private static String mtlFileName;
+
+
     public AssetAdapter(List<PolyObject> polyObjects) {
         this.polyObjects = polyObjects;
+    }
+
+    public static String getObjFileUrl() {
+        return objFileUrl;
+    }
+
+    public static String getMtlFileUrl() {
+        return mtlFileUrl;
+    }
+
+    public static String getMtlFileName() {
+        return mtlFileName;
     }
 
 
@@ -76,8 +105,20 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
                 .error(R.drawable.baseline_explore_black_24dp))
                 .into(assetPreview);
 
-        GetAssetTask getAssetTask = new GetAssetTask();
-        getAssetTask.execute(polyObject.getAssetURL());
+        chooseButton.setOnClickListener(v -> {
+            int externalPermissionCheck = ContextCompat.checkSelfPermission(context,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            if (externalPermissionCheck==-1){
+                askPermissionStorage();
+            }
+
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.
+                    WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                GetAssetTask getAssetTask = new GetAssetTask(context);
+                getAssetTask.execute(polyObject.getAssetURL());
+            }
+        });
+
 
     }
 
@@ -85,6 +126,19 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
     @Override
     public int getItemCount() {
         return polyObjects.size();
+    }
+
+
+    private void askPermissionStorage() {
+        //for media
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.
+                WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions((Activity) context, new
+                            String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    1);
+
+        }
     }
 
     // Provide a direct reference to each of the views within a data item
@@ -113,11 +167,12 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
     private static class GetAssetTask extends AsyncTask<String, Void, String> {
 
         private static final String TAG = "GetAssetTask";
-
         private JSONArray formats;
-        private String objFileUrl;
-        private String mtlFileUrl;
-        private String mtlFileName;
+        private WeakReference<Context> context;
+
+        private GetAssetTask(Context context) {
+            this.context = new WeakReference<>(context);
+        }
 
         @Override
         protected String doInBackground(String... params) {
@@ -139,6 +194,8 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
 
         @Override
         protected void onPostExecute(String result) {
+            Context c = context.get();
+
             try {
             //    Log.d(TAG, result);
                 JSONObject res = new JSONObject(result);
@@ -168,6 +225,40 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
+            //Download the .obj file
+            DownloadManager.Request objRequest = new DownloadManager.Request(Uri.parse(objFileUrl));
+            objRequest.setDescription("Some description");
+            objRequest.setTitle("Some title");
+            objRequest.allowScanningByMediaScanner();
+            objRequest.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            objRequest.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "asset.obj");
+
+            DownloadManager objDownloadManager = (DownloadManager) c.getSystemService(Context.DOWNLOAD_SERVICE);
+
+            if (objDownloadManager != null) {
+                objDownloadManager.enqueue(objRequest);
+            } else {
+                Log.e(TAG, "error downloading object");
+            }
+
+            //Download the .mtl file, don't change name
+            DownloadManager.Request mtlRequest = new DownloadManager.Request(Uri.parse(mtlFileUrl));
+            mtlRequest.setDescription("Some description");
+            mtlRequest.setTitle("Some title");
+            mtlRequest.allowScanningByMediaScanner();
+            mtlRequest.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            mtlRequest.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, mtlFileName);
+
+            DownloadManager mtlDownloadManager = (DownloadManager) c.getSystemService(Context.DOWNLOAD_SERVICE);
+
+            if (mtlDownloadManager != null) {
+                mtlDownloadManager.enqueue(mtlRequest);
+            } else {
+                Log.e(TAG, "error downloading materials");
+            }
         }
     }
+
+
 }
