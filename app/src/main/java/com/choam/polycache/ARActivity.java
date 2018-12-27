@@ -47,28 +47,7 @@ public class ARActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_preview);
-
-        ImageView preview = findViewById(R.id.expand_thumbnail);
-        Button cancel = findViewById(R.id.cancel_preview);
-        Button place = findViewById(R.id.place_button);
-
-        Intent i = getIntent();
-        Glide.with(this)
-                .load(i.getExtras().getString("thumbUrl"))
-                .transition(new DrawableTransitionOptions()
-                        .crossFade())
-                .apply(new RequestOptions()
-                        .placeholder(R.mipmap.ic_launcher)
-                        .error(R.drawable.baseline_explore_black_24dp))
-                .into(preview);
-
-        place.setOnClickListener(v -> {
-
-        });
-
-        //Kill current activity on cancel.
-        cancel.setOnClickListener(v -> finish());
+        setContentView(R.layout.activity_ar);
 
         fragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
         fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {

@@ -33,6 +33,7 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".ARActivity" />
         <activity android:name=".PolyAPICalls.PopulateAssetList"/>
+        <activity android:name=".PreviewActivity"/>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/api_key" />

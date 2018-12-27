@@ -33,6 +33,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import com.choam.polycache.ARActivity;
 import com.choam.polycache.Fragments.CreateFragment;
+import com.choam.polycache.PreviewActivity;
 import com.choam.polycache.R;
 
 import org.json.JSONArray;
@@ -56,7 +57,10 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
 
     private List<PolyObject> polyObjects;
     private Context context;
+
     private static String thumbUrlToPass;
+    private static String objToPass;
+    private static String mtlToPass;
 
     private static String objFileUrl;
     private static String mtlFileUrl;
@@ -168,6 +172,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
         private JSONArray formats;
         private WeakReference<Context> context;
 
+
         private GetAssetTask(Context context) {
             this.context = new WeakReference<>(context);
         }
@@ -235,7 +240,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
                     count++;
                     //When the 2 files complete open ARActivity.
                     if (count == 2) {
-                        Intent i = new Intent(c, ARActivity.class);
+                        Intent i = new Intent(c, PreviewActivity.class);
                         i.putExtra("thumbUrl", thumbUrlToPass);
                         c.startActivity(i);
                     }
@@ -251,6 +256,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
             objRequest.setVisibleInDownloadsUi(false);
             objRequest.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
             objRequest.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "asset.obj");
+            objToPass =
 
             DownloadManager objDownloadManager = (DownloadManager) c.getSystemService(Context.DOWNLOAD_SERVICE);
             objDownloadManager.enqueue(objRequest);
