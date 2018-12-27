@@ -102,22 +102,22 @@ public class CreateFragment extends Fragment  {
             if(selectedCategory.toLowerCase().equals("all") && params[0] != null && !params[0].isEmpty()) {
                 httpBuilder.addQueryParameter("key", API_KEY);
                 httpBuilder.addQueryParameter("keywords", params[0].toLowerCase());
-                httpBuilder.addQueryParameter("format", "GLTF");
+                httpBuilder.addQueryParameter("format", "GLTF2");
               //if they choose a cat and enter a search term
             } else if(!selectedCategory.toLowerCase().equals("all") && params[0] != null && !params[0].isEmpty()){
                 httpBuilder.addQueryParameter("key", API_KEY);
                 httpBuilder.addQueryParameter("category", selectedCategory.toLowerCase());
                 httpBuilder.addQueryParameter("keywords", params[0].toLowerCase());
-                httpBuilder.addQueryParameter("format", "GLTF");
+                httpBuilder.addQueryParameter("format", "GLTF2");
               //if they chose a cat but left the search box empty
             } else if(!selectedCategory.toLowerCase().equals("all") && (params[0] == null || params[0].isEmpty())) {
                 httpBuilder.addQueryParameter("key", API_KEY);
                 httpBuilder.addQueryParameter("category", selectedCategory.toLowerCase());
-                httpBuilder.addQueryParameter("format", "GLTF");
+                httpBuilder.addQueryParameter("format", "GLTF2");
               //if the cat is all and they didn't enter a search term
             } else if(selectedCategory.toLowerCase().equals("all") && (params[0] == null || params[0].isEmpty())) {
                 httpBuilder.addQueryParameter("key", API_KEY);
-                httpBuilder.addQueryParameter("format", "GLTF");
+                httpBuilder.addQueryParameter("format", "GLTF2");
             }
 
             Request request = new Request.Builder().url(httpBuilder.build()).build();

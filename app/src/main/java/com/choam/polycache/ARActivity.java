@@ -4,17 +4,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.bumptech.glide.request.RequestOptions;
 import com.choam.polycache.GoogleClasses.ResolveDialogFragment;
 import com.choam.polycache.GoogleClasses.StorageManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 
 import com.choam.polycache.GoogleClasses.SnackbarHelper;
 import com.google.ar.core.Anchor;
@@ -127,8 +123,9 @@ public class ARActivity extends AppCompatActivity {
                 .setSource(fragment.getContext(), RenderableSource.builder().setSource(
                         fragment.getContext(),
                         model,
-                        RenderableSource.SourceType.GLTF2).build())
-
+                        RenderableSource.SourceType.GLTF2)
+                        .setScale(0.5f)
+                        .build())
                 .setRegistryId(model)
                 .build()
                 .thenAccept(renderable -> addNodeToScene(fragment, anchor, renderable))

@@ -59,12 +59,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
     private Context context;
 
     private static String thumbUrlToPass;
-    private static String objToPass;
-    private static String mtlToPass;
-
     private static String gltfFileUrl;
-    private static String mtlFileUrl;
-    private static String mtlFileName;
 
 
     public AssetAdapter(List<PolyObject> polyObjects) {
@@ -209,48 +204,21 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
             try {
                 for (int i = 0; i < formats.length(); i++) {
                     JSONObject currentFormat = formats.getJSONObject(i);
-                    if(currentFormat.getString("formatType").equals("GLTF")) {
+                    if(currentFormat.getString("formatType").equals("GLTF2")) {
                         //get .gltf file details
                         gltfFileUrl = currentFormat.getJSONObject("root").getString("url");
-
                         break;
                     }
                 }
+
+                Intent i = new Intent(c, PreviewActivity.class);
+                i.putExtra("thumbUrl", thumbUrlToPass);
+                i.putExtra("gltfFileUrl", gltfFileUrl);
+                c.startActivity(i);
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-            //BroadcastReceiver when download completes.
-            String downloadCompleteIntentName = DownloadManager.ACTION_DOWNLOAD_COMPLETE;
-            IntentFilter downloadCompleteIntentFilter = new IntentFilter(downloadCompleteIntentName);
-
-            BroadcastReceiver downloadCompleteReceiver = new BroadcastReceiver() {
-                int count = 0;
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    count++;
-                    //When the 2 files complete open ARActivity.
-                    if (count == 1) {
-                        Intent i = new Intent(c, PreviewActivity.class);
-                        i.putExtra("thumbUrl", thumbUrlToPass);
-                        i.putExtra("gltfFileUrl", gltfFileUrl);
-                        c.startActivity(i);
-                    }
-                }
-            };
-            c.registerReceiver(downloadCompleteReceiver, downloadCompleteIntentFilter);
-
-            //Download the .gltf file
-            DownloadManager.Request gltfRequest = new DownloadManager.Request(Uri.parse(gltfFileUrl));
-            gltfRequest.setDescription("Downloading glTF File");
-            gltfRequest.setTitle("Downloading");
-            gltfRequest.allowScanningByMediaScanner();
-            gltfRequest.setVisibleInDownloadsUi(false);
-            gltfRequest.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-            gltfRequest.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "asset.gltf");
-
-            DownloadManager gltfDownloadManager = (DownloadManager) c.getSystemService(Context.DOWNLOAD_SERVICE);
-            gltfDownloadManager.enqueue(gltfRequest);
 
         }
     }
