@@ -1,14 +1,21 @@
 package com.choam.polycache;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestOptions;
 import com.choam.polycache.GoogleClasses.ResolveDialogFragment;
 import com.choam.polycache.GoogleClasses.StorageManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+
 import com.choam.polycache.GoogleClasses.SnackbarHelper;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
@@ -24,7 +31,6 @@ public class ARActivity extends AppCompatActivity {
 
     private CustomArFragment fragment;
     private Anchor cloudAnchor;
-
     //NONE by default, HOSTING when hosting the Anchor and HOSTED when the anchor is done hosting.
     private enum AppAnchorState {
         NONE,
@@ -41,7 +47,28 @@ public class ARActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ar);
+        setContentView(R.layout.fragment_preview);
+
+        ImageView preview = findViewById(R.id.expand_thumbnail);
+        Button cancel = findViewById(R.id.cancel_preview);
+        Button place = findViewById(R.id.place_button);
+
+        Intent i = getIntent();
+        Glide.with(this)
+                .load(i.getExtras().getString("thumbUrl"))
+                .transition(new DrawableTransitionOptions()
+                        .crossFade())
+                .apply(new RequestOptions()
+                        .placeholder(R.mipmap.ic_launcher)
+                        .error(R.drawable.baseline_explore_black_24dp))
+                .into(preview);
+
+        place.setOnClickListener(v -> {
+
+        });
+
+        //Kill current activity on cancel.
+        cancel.setOnClickListener(v -> finish());
 
         fragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
         fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {

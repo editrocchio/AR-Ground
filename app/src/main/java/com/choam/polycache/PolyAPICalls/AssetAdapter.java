@@ -4,7 +4,10 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.media.Image;
 import android.net.Uri;
@@ -13,6 +16,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,10 +26,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
+import com.choam.polycache.ARActivity;
 import com.choam.polycache.Fragments.CreateFragment;
 import com.choam.polycache.R;
 
@@ -50,6 +56,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
 
     private List<PolyObject> polyObjects;
     private Context context;
+    private static String thumbUrlToPass;
 
     private static String objFileUrl;
     private static String mtlFileUrl;
@@ -59,19 +66,6 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
     public AssetAdapter(List<PolyObject> polyObjects) {
         this.polyObjects = polyObjects;
     }
-
-    public static String getObjFileUrl() {
-        return objFileUrl;
-    }
-
-    public static String getMtlFileUrl() {
-        return mtlFileUrl;
-    }
-
-    public static String getMtlFileName() {
-        return mtlFileName;
-    }
-
 
     // inflating a layout from XML and returning the holder
     @NonNull
@@ -96,6 +90,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
         Button chooseButton = viewHolder.chooseButton;
         ImageView assetPreview = viewHolder.assetPreview;
 
+        //Load the thumbnail
         Glide.with(context)
                 .load(polyObject.getThumbURL())
                 .transition(new DrawableTransitionOptions()
@@ -105,6 +100,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
                 .error(R.drawable.baseline_explore_black_24dp))
                 .into(assetPreview);
 
+        //Check permission before downloading.
         chooseButton.setOnClickListener(v -> {
             int externalPermissionCheck = ContextCompat.checkSelfPermission(context,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -117,6 +113,8 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
                 GetAssetTask getAssetTask = new GetAssetTask(context);
                 getAssetTask.execute(polyObject.getAssetURL());
             }
+            //Pass this to ARActivity to load the thumbnail.
+            thumbUrlToPass = polyObject.getThumbURL();
         });
 
 
@@ -178,7 +176,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
         protected String doInBackground(String... params) {
             OkHttpClient httpClient = new OkHttpClient();
             String url = params[0];
-
+            //Send a GET request for the selected object only.
             HttpUrl.Builder httpBuilder = HttpUrl.parse(url).newBuilder();
             httpBuilder.addQueryParameter("key", CreateFragment.API_KEY);
             Request request = new Request.Builder().url(httpBuilder.build()).build();
@@ -226,37 +224,57 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
                 e.printStackTrace();
             }
 
+            //BroadcastReceiver when download completes.
+            String downloadCompleteIntentName = DownloadManager.ACTION_DOWNLOAD_COMPLETE;
+            IntentFilter downloadCompleteIntentFilter = new IntentFilter(downloadCompleteIntentName);
+
+            BroadcastReceiver downloadCompleteReceiver = new BroadcastReceiver() {
+                int count = 0;
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    count++;
+                    //When the 2 files complete open ARActivity.
+                    if (count == 2) {
+                        Intent i = new Intent(c, ARActivity.class);
+                        i.putExtra("thumbUrl", thumbUrlToPass);
+                        c.startActivity(i);
+                    }
+                }
+            };
+            c.registerReceiver(downloadCompleteReceiver, downloadCompleteIntentFilter);
+
             //Download the .obj file
             DownloadManager.Request objRequest = new DownloadManager.Request(Uri.parse(objFileUrl));
-            objRequest.setDescription("Some description");
-            objRequest.setTitle("Some title");
+            objRequest.setDescription("Downloading Object File");
+            objRequest.setTitle("Downloading");
             objRequest.allowScanningByMediaScanner();
+            objRequest.setVisibleInDownloadsUi(false);
             objRequest.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
             objRequest.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "asset.obj");
 
             DownloadManager objDownloadManager = (DownloadManager) c.getSystemService(Context.DOWNLOAD_SERVICE);
+            objDownloadManager.enqueue(objRequest);
 
-            if (objDownloadManager != null) {
-                objDownloadManager.enqueue(objRequest);
-            } else {
-                Log.e(TAG, "error downloading object");
-            }
 
             //Download the .mtl file, don't change name
             DownloadManager.Request mtlRequest = new DownloadManager.Request(Uri.parse(mtlFileUrl));
-            mtlRequest.setDescription("Some description");
-            mtlRequest.setTitle("Some title");
+            mtlRequest.setDescription("Downloading Material File");
+            mtlRequest.setTitle("Downloading");
             mtlRequest.allowScanningByMediaScanner();
+            mtlRequest.setVisibleInDownloadsUi(false);
             mtlRequest.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
             mtlRequest.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, mtlFileName);
 
             DownloadManager mtlDownloadManager = (DownloadManager) c.getSystemService(Context.DOWNLOAD_SERVICE);
+            mtlDownloadManager.enqueue(mtlRequest);
 
-            if (mtlDownloadManager != null) {
-                mtlDownloadManager.enqueue(mtlRequest);
-            } else {
-                Log.e(TAG, "error downloading materials");
-            }
+
+
+
+
+
+
+
         }
     }
 

@@ -7,7 +7,9 @@ import android.support.v7.widget.RecyclerView;
 
 import com.choam.polycache.R;
 
-
+/**
+ * This does the setup for the RecyclerView.
+ */
 public class PopulateAssetList extends AppCompatActivity {
 
     @Override

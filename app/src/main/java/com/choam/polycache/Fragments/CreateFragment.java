@@ -95,7 +95,7 @@ public class CreateFragment extends Fragment  {
         protected String doInBackground(String... params) {
             OkHttpClient httpClient = new OkHttpClient();
             String url =  BASE_URL + "assets/";
-
+            //Make the GET Request to Google Poly.
             HttpUrl.Builder httpBuilder = HttpUrl.parse(url).newBuilder();
 
             //If the cat is all and they put a search term.
@@ -134,9 +134,8 @@ public class CreateFragment extends Fragment  {
 
         @Override
         protected void onPostExecute(String result) {
-            View v = view.get();
             Context c = context.get();
-        //    Log.d(TAG, result);
+
             PolyObject.getPolyObjects().clear();
             try {
                 JSONObject res = new JSONObject(result);
@@ -144,7 +143,7 @@ public class CreateFragment extends Fragment  {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
+            //Parse the response to get required info for the last and add it to the PolyObject class.
             try {
                 for(int i=0; i<assets.length(); i++) {
                     String name = assets.getJSONObject(i).getString("displayName");
@@ -153,7 +152,6 @@ public class CreateFragment extends Fragment  {
                     String thumbURL = assets.getJSONObject(i).getJSONObject("thumbnail").getString("url");
 
                     PolyObject.addToPolyObjectList(new PolyObject(name, authorName, assetURL, thumbURL));
-
                 }
 
             } catch (JSONException e) {
@@ -162,8 +160,9 @@ public class CreateFragment extends Fragment  {
                 Toast.makeText(c, "Nothing found", Toast.LENGTH_SHORT).show();
             }
 
+            //If there are any PolyObjects then start the PopulateAssetList class.
             if(PolyObject.getPolyObjects().size() > 0) {
-                v.getContext().startActivity(new Intent(c, PopulateAssetList.class));
+                c.startActivity(new Intent(c, PopulateAssetList.class));
             }
 
         }
