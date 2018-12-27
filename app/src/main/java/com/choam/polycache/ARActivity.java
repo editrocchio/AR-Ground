@@ -21,6 +21,7 @@ import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
 import com.google.ar.sceneform.AnchorNode;
+import com.google.ar.sceneform.assets.RenderableSource;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
@@ -44,10 +45,15 @@ public class ARActivity extends AppCompatActivity {
     private SnackbarHelper snackbarHelper = new SnackbarHelper();
     private StorageManager storageManager;
 
+    private String url;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ar);
+
+        Intent i = getIntent();
+        url = i.getExtras().getString("gltfFileUrl");
 
         fragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
         fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
@@ -88,7 +94,7 @@ public class ARActivity extends AppCompatActivity {
                     snackbarHelper.showMessage(this, "Now hosting anchor...");
 
 
-                    placeObject(fragment, cloudAnchor, Uri.parse("monster.sfb"));
+                    placeObject(fragment, cloudAnchor, Uri.parse(url));
 
                 }
         );
@@ -118,7 +124,12 @@ public class ARActivity extends AppCompatActivity {
      */
     private void placeObject(ArFragment fragment, Anchor anchor, Uri model) {
         ModelRenderable.builder()
-                .setSource(fragment.getContext(), model)
+                .setSource(fragment.getContext(), RenderableSource.builder().setSource(
+                        fragment.getContext(),
+                        model,
+                        RenderableSource.SourceType.GLTF2).build())
+
+                .setRegistryId(model)
                 .build()
                 .thenAccept(renderable -> addNodeToScene(fragment, anchor, renderable))
                 .exceptionally((throwable -> {
@@ -207,7 +218,7 @@ public class ARActivity extends AppCompatActivity {
         storageManager.getCloudAnchorID(shortCode,(cloudAnchorId) -> {
             Anchor resolvedAnchor = fragment.getArSceneView().getSession().resolveCloudAnchor(cloudAnchorId);
             setCloudAnchor(resolvedAnchor);
-            placeObject(fragment, cloudAnchor, Uri.parse("monster.sfb"));
+            placeObject(fragment, cloudAnchor, Uri.parse(url));
             snackbarHelper.showMessage(this, "Now Resolving Anchor...");
             appAnchorState = AppAnchorState.RESOLVING;
         });

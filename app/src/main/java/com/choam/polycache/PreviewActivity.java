@@ -30,9 +30,12 @@ public class PreviewActivity extends AppCompatActivity {
                         .error(R.drawable.baseline_explore_black_24dp))
                 .into(preview);
 
-        place.setOnClickListener(v -> {
-            Intent arIntent = new Intent();
+        String assetUrl = i.getExtras().getString("gltfFileUrl");
 
+        place.setOnClickListener(v -> {
+            Intent arIntent = new Intent(this, ARActivity.class);
+            arIntent.putExtra("gltfFileUrl", assetUrl);
+            this.startActivity(arIntent);
         });
 
         //Kill current activity on cancel TODO: delete the file.

@@ -62,7 +62,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
     private static String objToPass;
     private static String mtlToPass;
 
-    private static String objFileUrl;
+    private static String gltfFileUrl;
     private static String mtlFileUrl;
     private static String mtlFileName;
 
@@ -200,7 +200,6 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
             Context c = context.get();
 
             try {
-            //    Log.d(TAG, result);
                 JSONObject res = new JSONObject(result);
                 formats = res.getJSONArray("formats");
             } catch (JSONException e) {
@@ -210,17 +209,9 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
             try {
                 for (int i = 0; i < formats.length(); i++) {
                     JSONObject currentFormat = formats.getJSONObject(i);
-                    if(currentFormat.getString("formatType").equals("OBJ")) {
-                        //get .obj file details
-                        objFileUrl = currentFormat.getJSONObject("root").getString("url");
-                        //get .mtl file details
-                        mtlFileUrl = currentFormat.getJSONArray("resources")
-                                .getJSONObject(0)
-                                .getString("url");
-
-                        mtlFileName = currentFormat.getJSONArray("resources")
-                                .getJSONObject(0)
-                                .getString("relativePath");
+                    if(currentFormat.getString("formatType").equals("GLTF")) {
+                        //get .gltf file details
+                        gltfFileUrl = currentFormat.getJSONObject("root").getString("url");
 
                         break;
                     }
@@ -239,47 +230,27 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
                 public void onReceive(Context context, Intent intent) {
                     count++;
                     //When the 2 files complete open ARActivity.
-                    if (count == 2) {
+                    if (count == 1) {
                         Intent i = new Intent(c, PreviewActivity.class);
                         i.putExtra("thumbUrl", thumbUrlToPass);
+                        i.putExtra("gltfFileUrl", gltfFileUrl);
                         c.startActivity(i);
                     }
                 }
             };
             c.registerReceiver(downloadCompleteReceiver, downloadCompleteIntentFilter);
 
-            //Download the .obj file
-            DownloadManager.Request objRequest = new DownloadManager.Request(Uri.parse(objFileUrl));
-            objRequest.setDescription("Downloading Object File");
-            objRequest.setTitle("Downloading");
-            objRequest.allowScanningByMediaScanner();
-            objRequest.setVisibleInDownloadsUi(false);
-            objRequest.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-            objRequest.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "asset.obj");
-            objToPass =
+            //Download the .gltf file
+            DownloadManager.Request gltfRequest = new DownloadManager.Request(Uri.parse(gltfFileUrl));
+            gltfRequest.setDescription("Downloading glTF File");
+            gltfRequest.setTitle("Downloading");
+            gltfRequest.allowScanningByMediaScanner();
+            gltfRequest.setVisibleInDownloadsUi(false);
+            gltfRequest.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            gltfRequest.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "asset.gltf");
 
-            DownloadManager objDownloadManager = (DownloadManager) c.getSystemService(Context.DOWNLOAD_SERVICE);
-            objDownloadManager.enqueue(objRequest);
-
-
-            //Download the .mtl file, don't change name
-            DownloadManager.Request mtlRequest = new DownloadManager.Request(Uri.parse(mtlFileUrl));
-            mtlRequest.setDescription("Downloading Material File");
-            mtlRequest.setTitle("Downloading");
-            mtlRequest.allowScanningByMediaScanner();
-            mtlRequest.setVisibleInDownloadsUi(false);
-            mtlRequest.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-            mtlRequest.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, mtlFileName);
-
-            DownloadManager mtlDownloadManager = (DownloadManager) c.getSystemService(Context.DOWNLOAD_SERVICE);
-            mtlDownloadManager.enqueue(mtlRequest);
-
-
-
-
-
-
-
+            DownloadManager gltfDownloadManager = (DownloadManager) c.getSystemService(Context.DOWNLOAD_SERVICE);
+            gltfDownloadManager.enqueue(gltfRequest);
 
         }
     }
