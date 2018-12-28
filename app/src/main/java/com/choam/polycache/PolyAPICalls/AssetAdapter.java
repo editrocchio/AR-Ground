@@ -2,37 +2,25 @@ package com.choam.polycache.PolyAPICalls;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.DownloadManager;
-import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.media.Image;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
-import com.choam.polycache.ARActivity;
-import com.choam.polycache.Fragments.CreateFragment;
+import com.choam.polycache.Fragments.SearchFragment;
 import com.choam.polycache.PreviewActivity;
 import com.choam.polycache.R;
 
@@ -40,7 +28,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -178,7 +165,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
             String url = params[0];
             //Send a GET request for the selected object only.
             HttpUrl.Builder httpBuilder = HttpUrl.parse(url).newBuilder();
-            httpBuilder.addQueryParameter("key", CreateFragment.API_KEY);
+            httpBuilder.addQueryParameter("key", SearchFragment.API_KEY);
             Request request = new Request.Builder().url(httpBuilder.build()).build();
 
             try {

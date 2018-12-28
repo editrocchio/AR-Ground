@@ -32,6 +32,10 @@
     <string name="logout_btn">Logout</string>
     <string name="email_password_reset_link">Reset Password</string>
     <string name="joined">Joined: %1$s</string>
+    <string name="category">Category</string>
+    <string name="search">Search</string>
+    <string name="search_term">Search Term</string>
+    <string name="search_google_poly">Search Google Poly</string>
 
 
 </resources>

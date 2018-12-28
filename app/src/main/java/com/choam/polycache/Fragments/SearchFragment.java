@@ -34,11 +34,11 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class CreateFragment extends Fragment  {
+public class SearchFragment extends Fragment  {
 
     public static final String API_KEY = BuildConfig.ApiKeyDebugPoly;
     public static final String BASE_URL = "https://poly.googleapis.com/v1/";
-    private static final String TAG = "CreateFragment";
+    private static final String TAG = "SearchFragment";
     private ReceiveFeedTask receiveFeedTask;
     private EditText catEditTxt;
     private static String selectedCategory;
@@ -47,7 +47,7 @@ public class CreateFragment extends Fragment  {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_create, container, false);
+        View view = inflater.inflate(R.layout.fragment_search, container, false);
 
         Button send = view.findViewById(R.id.btnSend);
         catEditTxt = view.findViewById(R.id.search_assets);

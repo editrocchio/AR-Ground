@@ -5,9 +5,19 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragments.CreateFragment"
+    tools:context=".Fragments.SearchFragment"
     android:orientation="vertical"
     android:gravity="center">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="100dp"
+        android:fontFamily="@font/roboto"
+        android:text="@string/search_google_poly"
+        android:textSize="30sp"
+        android:textColor="@color/black"/>
 
     <Spinner
         android:id="@+id/category_spinner"
@@ -15,8 +25,8 @@
         android:layout_height="30dp"
         android:layout_marginBottom="10dp"
         android:backgroundTint="@color/black"
-        android:prompt="@string/sign_up"
-        android:spinnerMode="dialog"/>
+        android:prompt="@string/category"
+        android:spinnerMode="dialog" />
 
 
     <EditText android:id="@+id/search_assets"
@@ -24,7 +34,7 @@
         android:layout_height="50dp"
         android:layout_marginBottom="50dp"
         android:inputType="text"
-        android:hint="Search"
+        android:hint="@string/search_term"
         android:textColor="@color/black"
         android:backgroundTint="@color/black"
         tools:targetApi="o"
@@ -33,10 +43,13 @@
 
     <Button
         android:id="@+id/btnSend"
-        android:layout_width="wrap_content"
+        android:layout_width="355dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="100dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:background="@drawable/round_button"
-        android:text="Send Request"
+        android:text="@string/search"
         android:textColor="#ffff" />
 
 </LinearLayout>

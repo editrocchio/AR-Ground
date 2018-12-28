@@ -9,9 +9,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
-import com.choam.polycache.Fragments.CreateFragment;
-import com.choam.polycache.Fragments.ExploreFragment;
+import com.choam.polycache.Fragments.SearchFragment;
 import com.choam.polycache.Fragments.LogFragment;
+import com.choam.polycache.Fragments.MapsFragment;
 import com.choam.polycache.Fragments.ProfileFragment;
 import com.choam.polycache.Fragments.SettingsFragment;
 
@@ -48,12 +48,12 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 case R.id.navigation_explore:
                     actionBar.setTitle("Explore");
-                    fragment = new ExploreFragment();
+                    fragment = new MapsFragment();
                     loadFragment(fragment);
                     return true;
                 case R.id.navigation_create:
                     actionBar.setTitle("Create");
-                    fragment = new CreateFragment();
+                    fragment = new SearchFragment();
                     loadFragment(fragment);
                     return true;
                 case R.id.navigation_logs:
