@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import com.choam.polycache.Fragments.CreateFragment;
 import com.choam.polycache.Fragments.ExploreFragment;
 import com.choam.polycache.Fragments.LogFragment;
-import com.choam.polycache.Fragments.MapsFragment;
 import com.choam.polycache.Fragments.ProfileFragment;
 import com.choam.polycache.Fragments.SettingsFragment;
 

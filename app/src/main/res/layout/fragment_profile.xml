@@ -10,36 +10,35 @@
 
     <ImageView
         android:id="@+id/ivProfile"
-        android:contentDescription="profileimage"
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="60dp"
         android:padding="5dp"
         android:src="@drawable/funny_profile_pictures_imag"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/tvName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textSize="22sp"
+        android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivProfile"
-        android:text="John Javaface"
-        android:textSize="22sp"
-        android:textStyle="bold"/>
+        app:layout_constraintTop_toBottomOf="@+id/ivProfile" />
 
     <TextView
-        android:id="@+id/tvDescription"
+        android:id="@+id/tvDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvName"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvName"
-        android:text="Joined: 12/15/2018"
         android:textSize="12sp"/>
 
     <LinearLayout
@@ -47,7 +46,7 @@
         android:baselineAligned="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/tvDescription"
+        app:layout_constraintTop_toBottomOf="@id/tvDate"
         android:layout_marginTop="10dp">
 
         <LinearLayout
@@ -69,7 +68,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Finds"
+                android:text="Active"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -79,7 +78,6 @@
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:background="#A9A9A9" />
-
 
         <LinearLayout
             android:layout_width="0dp"
@@ -100,7 +98,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Uploads"
+                android:text="My Creations"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -118,26 +116,35 @@
 
     <Button
         android:id="@+id/btnUpdate"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/line"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="10dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="176dp"
+        android:layout_marginEnd="8dp"
         android:background="@drawable/round_button"
-        android:text="Update"
-        android:textColor="#ffff" />
+        android:text="Update Profile"
+        android:textColor="#ffff"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivProfile" />
 
     <Button
         android:id="@+id/logout_btn"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/btnUpdate"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="10dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/round_button"
         android:text="@string/logout_btn"
-        android:textColor="#ffff" />
+        android:textColor="#ffff"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnUpdate"
+        app:layout_constraintVertical_bias="0.0" />
 
 </android.support.constraint.ConstraintLayout>

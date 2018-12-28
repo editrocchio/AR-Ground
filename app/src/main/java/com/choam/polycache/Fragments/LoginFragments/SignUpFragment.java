@@ -22,23 +22,31 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.choam.polycache.MainActivity;
 import com.choam.polycache.R;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class SignUpFragment extends Fragment {
-    EditText email;
-    EditText username;
-    EditText password;
-    AppCompatButton regButton;
-    FirebaseAuth firebaseAuth;
+    private EditText email;
+    private EditText username;
+    private EditText password;
+    private AppCompatButton regButton;
+    private FirebaseAuth firebaseAuth;
+    private DatabaseReference database;
+
 
     @Override
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         firebaseAuth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance().getReference();
+
     }
 
     @Override
@@ -103,13 +111,19 @@ public class SignUpFragment extends Fragment {
             firebaseAuth.createUserWithEmailAndPassword(emailText, passText)
                     .addOnCompleteListener(task -> {
                         if(task.isSuccessful()){
+                            writeUserToDB(task.getResult().getUser().getUid(), nameText, new SimpleDateFormat("MMM-dd-yyyy", Locale.getDefault()).format(new Date()));
                             startActivity(new Intent(view.getContext(), MainActivity.class));
                         }
                         else{
-                            Toast.makeText(view.getContext(),"E-mail or password is wrong",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(view.getContext(),"An error occurred",Toast.LENGTH_SHORT).show();
                         }
                     });
         });
+    }
+
+    public void writeUserToDB(String userID, String name, String date) {
+        database.child("users").child(userID).child("username").setValue(name);
+        database.child("users").child(userID).child("joined").setValue(date);
     }
 
     public void loadFragment(Fragment fragment) {
@@ -121,5 +135,6 @@ public class SignUpFragment extends Fragment {
         transaction.addToBackStack(MainActivity.BACK_STACK_ROOT_TAG);
         transaction.commit();
     }
+
 
 }
