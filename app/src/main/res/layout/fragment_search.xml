@@ -5,7 +5,7 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragments.ExploreFragment"
+    tools:context=".Fragments.CreateFragment"
     android:orientation="vertical"
     android:gravity="center">
 
@@ -14,7 +14,9 @@
         android:layout_width="200dp"
         android:layout_height="30dp"
         android:layout_marginBottom="10dp"
-        android:backgroundTint="@color/black" />
+        android:backgroundTint="@color/black"
+        android:prompt="@string/sign_up"
+        android:spinnerMode="dialog"/>
 
 
     <EditText android:id="@+id/search_assets"
