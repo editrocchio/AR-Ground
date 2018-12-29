@@ -124,7 +124,7 @@ public class ARActivity extends AppCompatActivity {
                         fragment.getContext(),
                         model,
                         RenderableSource.SourceType.GLTF2)
-                        .setScale(0.5f)
+                        .setScale(0.3f)
                         .build())
                 .setRegistryId(model)
                 .build()

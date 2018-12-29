@@ -28,6 +28,12 @@
         android:prompt="@string/category"
         android:spinnerMode="dialog" />
 
+    <Spinner
+        android:id="@+id/results_spinner"
+        android:layout_width="100dp"
+        android:layout_height="30dp"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="@color/black"/>
 
     <EditText android:id="@+id/search_assets"
         android:layout_width="200dp"

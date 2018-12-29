@@ -12,15 +12,15 @@ import com.choam.polycache.R;
  */
 public class PopulateAssetList extends AppCompatActivity {
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.rv_list);
 
         RecyclerView rvAssets = findViewById(R.id.rvAssets);
-
-        AssetAdapter assetAdapter = new AssetAdapter(PolyObject.getPolyObjects());
         rvAssets.setLayoutManager(new LinearLayoutManager(this));
+        AssetAdapter assetAdapter = new AssetAdapter(PolyObject.getPolyObjects());
         rvAssets.setAdapter(assetAdapter);
     }
 }

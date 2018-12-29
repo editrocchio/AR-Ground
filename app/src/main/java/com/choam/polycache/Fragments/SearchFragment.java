@@ -28,6 +28,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
 
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -42,6 +43,10 @@ public class SearchFragment extends Fragment  {
     private ReceiveFeedTask receiveFeedTask;
     private EditText catEditTxt;
     private static String selectedCategory;
+    private static String resultsPerPage;
+
+    //Pass this to PopulateAssetList so we can make more requests on scroll to bottom
+    private static HashMap<String, String> queryParams;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,16 +56,17 @@ public class SearchFragment extends Fragment  {
 
         Button send = view.findViewById(R.id.btnSend);
         catEditTxt = view.findViewById(R.id.search_assets);
-        Spinner spinner = view.findViewById(R.id.category_spinner);
+        Spinner catSpinner = view.findViewById(R.id.category_spinner);
+        Spinner resSpinner = view.findViewById(R.id.results_spinner);
         selectedCategory = "";
 
         // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(view.getContext(),
+        ArrayAdapter<CharSequence> catAdapter = ArrayAdapter.createFromResource(view.getContext(),
                 R.array.categories_array, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        catAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        catSpinner.setAdapter(catAdapter);
+        catSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedCategory = parent.getItemAtPosition(position).toString();
@@ -69,6 +75,22 @@ public class SearchFragment extends Fragment  {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 selectedCategory = "";
+            }
+        });
+
+        ArrayAdapter<CharSequence> resAdapter = ArrayAdapter.createFromResource(view.getContext(),
+                R.array.results_array, android.R.layout.simple_spinner_item);
+        resAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        resSpinner.setAdapter(resAdapter);
+        resSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                resultsPerPage = parent.getItemAtPosition(position).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                resultsPerPage = "";
             }
         });
 
@@ -103,21 +125,25 @@ public class SearchFragment extends Fragment  {
                 httpBuilder.addQueryParameter("key", API_KEY);
                 httpBuilder.addQueryParameter("keywords", params[0].toLowerCase());
                 httpBuilder.addQueryParameter("format", "GLTF2");
+                httpBuilder.addQueryParameter("pageSize", resultsPerPage);
               //if they choose a cat and enter a search term
             } else if(!selectedCategory.toLowerCase().equals("all") && params[0] != null && !params[0].isEmpty()){
                 httpBuilder.addQueryParameter("key", API_KEY);
                 httpBuilder.addQueryParameter("category", selectedCategory.toLowerCase());
                 httpBuilder.addQueryParameter("keywords", params[0].toLowerCase());
                 httpBuilder.addQueryParameter("format", "GLTF2");
+                httpBuilder.addQueryParameter("pageSize", resultsPerPage);
               //if they chose a cat but left the search box empty
             } else if(!selectedCategory.toLowerCase().equals("all") && (params[0] == null || params[0].isEmpty())) {
                 httpBuilder.addQueryParameter("key", API_KEY);
                 httpBuilder.addQueryParameter("category", selectedCategory.toLowerCase());
                 httpBuilder.addQueryParameter("format", "GLTF2");
+                httpBuilder.addQueryParameter("pageSize", resultsPerPage);
               //if the cat is all and they didn't enter a search term
             } else if(selectedCategory.toLowerCase().equals("all") && (params[0] == null || params[0].isEmpty())) {
                 httpBuilder.addQueryParameter("key", API_KEY);
                 httpBuilder.addQueryParameter("format", "GLTF2");
+                httpBuilder.addQueryParameter("pageSize", resultsPerPage);
             }
 
             Request request = new Request.Builder().url(httpBuilder.build()).build();

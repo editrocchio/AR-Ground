@@ -36,6 +36,7 @@
     <string name="search">Search</string>
     <string name="search_term">Search Term</string>
     <string name="search_google_poly">Search Google Poly</string>
+    <string name="select">Select</string>
 
 
 </resources>

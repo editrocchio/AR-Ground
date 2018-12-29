@@ -86,19 +86,9 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
                 .error(R.drawable.baseline_explore_black_24dp))
                 .into(assetPreview);
 
-        //Check permission before downloading.
         chooseButton.setOnClickListener(v -> {
-            int externalPermissionCheck = ContextCompat.checkSelfPermission(context,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            if (externalPermissionCheck==-1){
-                askPermissionStorage();
-            }
-
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.
-                    WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                GetAssetTask getAssetTask = new GetAssetTask(context);
-                getAssetTask.execute(polyObject.getAssetURL());
-            }
+            GetAssetTask getAssetTask = new GetAssetTask(context);
+            getAssetTask.execute(polyObject.getAssetURL());
             //Pass this to ARActivity to load the thumbnail.
             thumbUrlToPass = polyObject.getThumbURL();
         });
@@ -112,18 +102,6 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
         return polyObjects.size();
     }
 
-
-    private void askPermissionStorage() {
-        //for media
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.
-                WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions((Activity) context, new
-                            String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    1);
-
-        }
-    }
 
     // Provide a direct reference to each of the views within a data item
     // Used to cache the views within the item layout for fast access

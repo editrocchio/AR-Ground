@@ -13,7 +13,8 @@
         android:id="@+id/asset_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:layout_marginStart="5dp"/>
 
     <ImageView
         android:id="@+id/asset_preview"
@@ -28,7 +29,7 @@
         android:layout_height="wrap_content"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:text="Select"
+        android:text="@string/select"
         android:textSize="12sp" />
 
 </LinearLayout>
