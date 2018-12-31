@@ -1,4 +1,4 @@
-package com.choam.polycache;
+package com.choam.arground;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,11 +9,11 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
-import com.choam.polycache.Fragments.SearchFragment;
-import com.choam.polycache.Fragments.LogFragment;
-import com.choam.polycache.Fragments.MapsFragment;
-import com.choam.polycache.Fragments.ProfileFragment;
-import com.choam.polycache.Fragments.SettingsFragment;
+import com.choam.arground.Fragments.SearchFragment;
+import com.choam.arground.Fragments.LogFragment;
+import com.choam.arground.Fragments.MapsFragment;
+import com.choam.arground.Fragments.ProfileFragment;
+import com.choam.arground.Fragments.SettingsFragment;
 
 public class MainActivity extends AppCompatActivity {
 

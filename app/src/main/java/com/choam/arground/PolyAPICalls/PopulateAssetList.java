@@ -1,11 +1,11 @@
-package com.choam.polycache.PolyAPICalls;
+package com.choam.arground.PolyAPICalls;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.choam.polycache.R;
+import com.choam.arground.R;
 
 /**
  * This does the setup for the RecyclerView.

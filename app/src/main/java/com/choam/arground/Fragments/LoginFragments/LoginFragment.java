@@ -1,4 +1,4 @@
-package com.choam.polycache.Fragments.LoginFragments;
+package com.choam.arground.Fragments.LoginFragments;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -22,8 +22,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.choam.polycache.MainActivity;
-import com.choam.polycache.R;
+import com.choam.arground.MainActivity;
+import com.choam.arground.R;
 import com.google.firebase.auth.FirebaseAuth;
 
 

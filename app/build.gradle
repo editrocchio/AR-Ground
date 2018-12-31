@@ -7,7 +7,7 @@ apply plugin: 'com.google.gms.google-services'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.choam.polycache"
+        applicationId "com.choam.arground"
         minSdkVersion 24
         targetSdkVersion 28
         versionCode 1
@@ -16,13 +16,13 @@ android {
     }
     buildTypes {
         debug {
-            buildConfigField 'String', "ApiKeyDebug", PolyCache_GoogleAPIKey
-            resValue 'string', "api_key", PolyCache_GoogleAPIKey
-            buildConfigField 'String', "ApiKeyDebugPoly", PolyCache_PolyAPIKey
+            buildConfigField 'String', "ApiKeyDebug", ARGround_GoogleAPIKey
+            resValue 'string', "api_key", ARGround_GoogleAPIKey
+            buildConfigField 'String', "ApiKeyDebugPoly", ARGround_PolyAPIKey
         }
         release {
             minifyEnabled false
-            buildConfigField 'String', "ApiKeyRelease", PolyCache_GoogleAPIKey
+            buildConfigField 'String', "ApiKeyRelease", ARGround_GoogleAPIKey
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -32,12 +32,6 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
-    }
-}
-
-repositories {
-    maven {
-        url 'https://raw.github.com/zeeshanejaz/unirest-android/mvn-repo'
     }
 }
 

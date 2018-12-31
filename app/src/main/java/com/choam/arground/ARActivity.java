@@ -1,18 +1,17 @@
-package com.choam.polycache;
+package com.choam.arground;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
-import com.choam.polycache.GoogleClasses.ResolveDialogFragment;
-import com.choam.polycache.GoogleClasses.StorageManager;
+import com.choam.arground.GoogleClasses.ResolveDialogFragment;
+import com.choam.arground.GoogleClasses.StorageManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.Button;
 
-import com.choam.polycache.GoogleClasses.SnackbarHelper;
+import com.choam.arground.GoogleClasses.SnackbarHelper;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;

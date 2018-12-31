@@ -1,4 +1,4 @@
-package com.choam.polycache.Fragments;
+package com.choam.arground.Fragments;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,9 +16,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.choam.polycache.Fragments.LoginFragments.SignUpFragment;
-import com.choam.polycache.LoginActivity;
-import com.choam.polycache.R;
+import com.choam.arground.LoginActivity;
+import com.choam.arground.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;

@@ -1,14 +1,9 @@
-package com.choam.polycache.PolyAPICalls;
+package com.choam.arground.PolyAPICalls;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,9 +15,9 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
-import com.choam.polycache.Fragments.SearchFragment;
-import com.choam.polycache.PreviewActivity;
-import com.choam.polycache.R;
+import com.choam.arground.Fragments.SearchFragment;
+import com.choam.arground.PreviewActivity;
+import com.choam.arground.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
