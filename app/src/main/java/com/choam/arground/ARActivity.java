@@ -6,8 +6,11 @@ import android.os.Bundle;
 
 import com.choam.arground.GoogleClasses.ResolveDialogFragment;
 import com.choam.arground.GoogleClasses.StorageManager;
+
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.Button;
 
@@ -21,6 +24,11 @@ import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Random;
 
@@ -43,6 +51,10 @@ public class ARActivity extends AppCompatActivity {
     private StorageManager storageManager;
 
     private String url;
+
+    private DatabaseReference database;
+    private static final String ANCHOR_ID_START = "anchor:";
+    private static final String ANCHOR_NODE_NAME = "cloud_anchors";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +112,7 @@ public class ARActivity extends AppCompatActivity {
         );
 
         storageManager = new StorageManager(this);
+        database = FirebaseDatabase.getInstance().getReference();
     }
 
     //Ensures there's only one cloud anchor at a time.
@@ -183,17 +196,12 @@ public class ARActivity extends AppCompatActivity {
                         + cloudState);
                 appAnchorState = AppAnchorState.NONE;
             } else if (cloudState == Anchor.CloudAnchorState.SUCCESS) {
-                storageManager.nextShortCode((shortCode) -> {
-                    if (shortCode == null){
-                        snackbarHelper.showMessageWithDismiss(this, "Could not get shortCode");
-                        return;
-                    }
-                    storageManager.storeUsingShortCode(shortCode, cloudAnchor.getCloudAnchorId());
 
-                    snackbarHelper.showMessageWithDismiss(this, "Anchor hosted! Cloud Short Code: " +
-                            shortCode);
-                });
-
+                String code = generateCode();
+                //TODO: Check if code already exists in firebase
+                database.child(ANCHOR_NODE_NAME).child(code).setValue(cloudAnchor.getCloudAnchorId());
+                snackbarHelper.showMessageWithDismiss(ARActivity.this, "Anchor hosted! Cloud Short Code: " +
+                        code.substring(7));
                 appAnchorState = AppAnchorState.HOSTED;
             }
         }
@@ -231,7 +239,8 @@ public class ARActivity extends AppCompatActivity {
      */
     public String generateCode() {
         Random r = new Random();
-        return "" + r.nextInt(11) + r.nextInt(11) + r.nextInt(11)
-                + r.nextInt(11);
+
+        return ANCHOR_ID_START + r.nextInt(10) + r.nextInt(10) + r.nextInt(10)
+        + r.nextInt(10);
     }
 }

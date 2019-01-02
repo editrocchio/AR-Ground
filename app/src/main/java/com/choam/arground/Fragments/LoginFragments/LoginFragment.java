@@ -95,7 +95,7 @@ public class LoginFragment extends Fragment {
 
     public void signIn(String e, String p, View view) {
         if(TextUtils.isEmpty(e) || TextUtils.isEmpty(p)){
-            Toast.makeText(view.getContext(),"Incorrect email/password combination",Toast.LENGTH_SHORT).show();
+            Toast.makeText(view.getContext(),"Missing Field",Toast.LENGTH_SHORT).show();
             return;
         }
 
