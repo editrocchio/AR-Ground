@@ -22,6 +22,8 @@ import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
+import java.util.Random;
+
 
 public class ARActivity extends AppCompatActivity {
 
@@ -81,15 +83,18 @@ public class ARActivity extends AppCompatActivity {
                         return;
                     }
 
-                    Anchor newAnchor = fragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor());
-
-                    setCloudAnchor(newAnchor);
-
-                    appAnchorState = AppAnchorState.HOSTING;
-                    snackbarHelper.showMessage(this, "Now hosting anchor...");
-
-
-                    placeObject(fragment, cloudAnchor, Uri.parse(url));
+                    //If host is checked then create cloud anchor and host, otherwise just place
+                    //regular anchor.
+                    if(PreviewActivity.getHost()) {
+                        Anchor newAnchor = fragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor());
+                        setCloudAnchor(newAnchor);
+                        appAnchorState = AppAnchorState.HOSTING;
+                        snackbarHelper.showMessage(this, "Now hosting anchor...");
+                        placeObject(fragment, cloudAnchor, Uri.parse(url));
+                    } else {
+                        Anchor newAnchor = hitResult.createAnchor();
+                        placeObject(fragment, newAnchor, Uri.parse(url));
+                    }
 
                 }
         );
@@ -220,5 +225,13 @@ public class ARActivity extends AppCompatActivity {
         });
     }
 
-
+    /**
+     * Generate a random 4 digit code for private cloud anchors.
+     * @return  Pseudo random 4 digit code (each digit between 0 and 10).
+     */
+    public String generateCode() {
+        Random r = new Random();
+        return "" + r.nextInt(11) + r.nextInt(11) + r.nextInt(11)
+                + r.nextInt(11);
+    }
 }

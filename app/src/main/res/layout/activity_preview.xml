@@ -14,12 +14,22 @@
         android:layout_height="250dp"
         tools:ignore="ContentDescription" />
 
+    <Switch
+        android:id="@+id/cloud_switch"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/roboto"
+        android:text="Host"
+        android:textStyle="bold"
+        android:layout_marginTop="30dp"
+        android:background="#e0e0e0"
+  />
+
     <Button
         android:id="@+id/place_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Place in World"
-        android:layout_marginTop="30dp"/>
+        android:text="Place in World" />
 
     <Button
         android:id="@+id/cancel_preview"
