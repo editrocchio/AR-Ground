@@ -14,16 +14,33 @@
         android:layout_height="250dp"
         tools:ignore="ContentDescription" />
 
-    <Switch
-        android:id="@+id/cloud_switch"
-        android:layout_width="80dp"
+    <RadioGroup
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/roboto"
-        android:text="Host"
-        android:textStyle="bold"
-        android:layout_marginTop="30dp"
         android:background="#e0e0e0"
-  />
+        android:id="@+id/share_radio_group"
+        android:checkedButton="@+id/not_shared"
+        android:layout_marginTop="30dp">
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/not_shared"
+            android:text="Not shared"/>
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/share_pub"
+            android:text="Share publicly"/>
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/share_priv"
+            android:text="Share privately"/>
+
+        </RadioGroup>
 
     <Button
         android:id="@+id/place_button"
@@ -36,9 +53,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Cancel"
-
         tools:ignore="ButtonOrder" />
-
 
 
 </LinearLayout>

@@ -61,7 +61,6 @@ public class ARActivity extends AppCompatActivity {
 
     private ProgressBar progressBar;
     private TextView progressText;
-    private Renderable currentModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +78,7 @@ public class ARActivity extends AppCompatActivity {
 
         fragment.getPlaneDiscoveryController().hide();
 
-        Button clearButton = findViewById(R.id.clear_button);
+       /* Button clearButton = findViewById(R.id.clear_button);
         clearButton.setOnClickListener(view -> setCloudAnchor(null));
 
         Button resolveButton = findViewById(R.id.resolve_button);
@@ -92,7 +91,7 @@ public class ARActivity extends AppCompatActivity {
             dialog.setOkListener(ARActivity.this::onResolveOkPressed);
             dialog.show(getSupportFragmentManager(), "Resolve");
 
-        });
+        }); */
 
         fragment.setOnTapArPlaneListener(
                 (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
@@ -108,7 +107,13 @@ public class ARActivity extends AppCompatActivity {
 
                     //If host is checked then create cloud anchor and host, otherwise just place
                     //regular anchor.
-                    if(PreviewActivity.getHost()) {
+                    if(PreviewActivity.getChoice().equals("private")) {
+                        Anchor newAnchor = fragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor());
+                        setCloudAnchor(newAnchor);
+                        appAnchorState = AppAnchorState.HOSTING;
+                        snackbarHelper.showMessage(this, "Now hosting anchor...");
+                        placeObject(fragment, cloudAnchor, Uri.parse(url));
+                    } else if(PreviewActivity.getChoice().equals("public")) {
                         Anchor newAnchor = fragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor());
                         setCloudAnchor(newAnchor);
                         appAnchorState = AppAnchorState.HOSTING;
@@ -215,7 +220,6 @@ public class ARActivity extends AppCompatActivity {
                         + cloudState);
                 appAnchorState = AppAnchorState.NONE;
             } else if (cloudState == Anchor.CloudAnchorState.SUCCESS) {
-
                 String code = generateCode();
                 //TODO: Check if code already exists in firebase
                 database.child(ANCHOR_NODE_NAME).child(code).setValue(cloudAnchor.getCloudAnchorId());
