@@ -12,7 +12,10 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.choam.arground.GoogleClasses.SnackbarHelper;
 import com.google.ar.core.Anchor;
@@ -56,6 +59,10 @@ public class ARActivity extends AppCompatActivity {
     private static final String ANCHOR_ID_START = "anchor:";
     private static final String ANCHOR_NODE_NAME = "cloud_anchors";
 
+    private ProgressBar progressBar;
+    private TextView progressText;
+    private Renderable currentModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,6 +102,10 @@ public class ARActivity extends AppCompatActivity {
                         return;
                     }
 
+                    //Start progress bar
+                    progressBar.setVisibility(View.VISIBLE);
+                    progressText.setText(R.string.rendering_load);
+
                     //If host is checked then create cloud anchor and host, otherwise just place
                     //regular anchor.
                     if(PreviewActivity.getHost()) {
@@ -110,6 +121,10 @@ public class ARActivity extends AppCompatActivity {
 
                 }
         );
+
+        progressBar = findViewById(R.id.progressBar_cyclic);
+        progressBar.setVisibility(View.INVISIBLE);
+        progressText = findViewById(R.id.progress_text);
 
         storageManager = new StorageManager(this);
         database = FirebaseDatabase.getInstance().getReference();
@@ -175,6 +190,10 @@ public class ARActivity extends AppCompatActivity {
         node.setParent(anchorNode);
         fragment.getArSceneView().getScene().addChild(anchorNode);
         node.select();
+
+        //Remove progress bar once placed.
+        progressBar.setVisibility(View.INVISIBLE);
+        progressText.setText("");
     }
 
     /*Check if the anchor has finished hosting every time a frame is updated. To do this, we can
