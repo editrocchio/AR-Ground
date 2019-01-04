@@ -38,6 +38,8 @@
     <string name="search_google_poly">Search Google Poly</string>
     <string name="select">Select</string>
     <string name="rendering_load">Rendering 3D Object...</string>
+    <string name="ok">OK</string>
+    <string name="copy">Copy to Clipboard</string>
 
 
 </resources>

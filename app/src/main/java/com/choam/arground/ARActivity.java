@@ -1,5 +1,9 @@
 package com.choam.arground;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.choam.arground.GoogleClasses.SnackbarHelper;
 import com.google.ar.core.Anchor;
@@ -111,7 +116,6 @@ public class ARActivity extends AppCompatActivity {
                         Anchor newAnchor = fragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor());
                         setCloudAnchor(newAnchor);
                         appAnchorState = AppAnchorState.HOSTING;
-                        snackbarHelper.showMessage(this, "Now hosting anchor...");
                         placeObject(fragment, cloudAnchor, Uri.parse(url));
                     } else if(PreviewActivity.getChoice().equals("public")) {
                         Anchor newAnchor = fragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor());
@@ -196,9 +200,13 @@ public class ARActivity extends AppCompatActivity {
         fragment.getArSceneView().getScene().addChild(anchorNode);
         node.select();
 
-        //Remove progress bar once placed.
-        progressBar.setVisibility(View.INVISIBLE);
-        progressText.setText("");
+        if(!PreviewActivity.getChoice().equals("private")) {
+            //Remove progress bar once placed if it's not private.
+            progressBar.setVisibility(View.INVISIBLE);
+            progressText.setText("");
+        } else {
+            progressText.setText("Generating shareable code...");
+        }
     }
 
     /*Check if the anchor has finished hosting every time a frame is updated. To do this, we can
@@ -220,11 +228,38 @@ public class ARActivity extends AppCompatActivity {
                         + cloudState);
                 appAnchorState = AppAnchorState.NONE;
             } else if (cloudState == Anchor.CloudAnchorState.SUCCESS) {
-                String code = generateCode();
-                //TODO: Check if code already exists in firebase
-                database.child(ANCHOR_NODE_NAME).child(code).setValue(cloudAnchor.getCloudAnchorId());
-                snackbarHelper.showMessageWithDismiss(ARActivity.this, "Anchor hosted! Cloud Short Code: " +
-                        code.substring(7));
+                //Only do this if we're hosting privately. Generate short code and show to user with
+                //alert dialog. If it's public then we don't need to give user code.
+                if(PreviewActivity.getChoice().equals("private")) {
+                    String code = generateCode();
+                    //TODO: Check if code already exists in firebase
+                    database.child(ANCHOR_NODE_NAME).child(code).setValue(cloudAnchor.getCloudAnchorId());
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage("Your shareable code is: " + code.substring(7));
+                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
+                        }
+                    });
+                    builder.setNegativeButton(R.string.copy, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                            ClipData clip = ClipData.newPlainText("code", code);
+                            if (clipboard != null) {
+                                clipboard.setPrimaryClip(clip);
+                                Toast.makeText(ARActivity.this, "Copied to clipboard!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+
+                    progressBar.setVisibility(View.INVISIBLE);
+                    progressText.setText("");
+
+                }
+
                 appAnchorState = AppAnchorState.HOSTED;
             }
         }
