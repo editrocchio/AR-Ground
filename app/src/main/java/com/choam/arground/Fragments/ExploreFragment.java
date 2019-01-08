@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 import com.choam.arground.BuildConfig;
 import com.choam.arground.PolyAPICalls.PolyObject;
 import com.choam.arground.PolyAPICalls.PopulateAssetList;
+import com.choam.arground.PrivateARActivity;
 import com.choam.arground.R;
 
 import org.json.JSONArray;
@@ -58,6 +60,25 @@ public class ExploreFragment extends Fragment  {
         Spinner catSpinner = view.findViewById(R.id.category_spinner);
         Spinner resSpinner = view.findViewById(R.id.results_spinner);
         selectedCategory = "";
+
+        Button openMap = view.findViewById(R.id.open_map);
+        openMap.setOnClickListener(v -> {
+            Fragment fragment = new MapsFragment();
+            FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.frame_container, fragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
+        });
+
+        EditText codeInput = view.findViewById(R.id.private_code);
+
+        Button privateCodeButton = view.findViewById(R.id.private_cam);
+        privateCodeButton.setOnClickListener(v -> {
+            String code = codeInput.getText().toString();
+            Intent i = new Intent(view.getContext(), PrivateARActivity.class);
+            i.putExtra("code", code);
+            startActivity(i);
+        });
 
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> catAdapter = ArrayAdapter.createFromResource(view.getContext(),

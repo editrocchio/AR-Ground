@@ -7,14 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-
-import com.choam.arground.GoogleClasses.ResolveDialogFragment;
-import com.choam.arground.GoogleClasses.StorageManager;
-
-import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -22,7 +16,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.choam.arground.GoogleClasses.ResolveDialogFragment;
 import com.choam.arground.GoogleClasses.SnackbarHelper;
+import com.choam.arground.GoogleClasses.StorageManager;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
@@ -32,16 +28,12 @@ import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.Random;
 
-
-public class ARActivity extends AppCompatActivity {
+public class PrivateARActivity extends AppCompatActivity {
 
     private CustomArFragment fragment;
     private Anchor cloudAnchor;
@@ -73,7 +65,7 @@ public class ARActivity extends AppCompatActivity {
         setContentView(R.layout.activity_ar);
 
         Intent i = getIntent();
-        url = i.getExtras().getString("gltfFileUrl");
+        url = i.getExtras().getString("code");
 
         fragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
         fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
@@ -82,7 +74,7 @@ public class ARActivity extends AppCompatActivity {
         });
 
 
-       /* Button clearButton = findViewById(R.id.clear_button);
+        Button clearButton = findViewById(R.id.clear_button);
         clearButton.setOnClickListener(view -> setCloudAnchor(null));
 
         Button resolveButton = findViewById(R.id.resolve_button);
@@ -91,43 +83,10 @@ public class ARActivity extends AppCompatActivity {
                 snackbarHelper.showMessageWithDismiss(getParent(), "Please clear Anchor");
                 return;            }
             ResolveDialogFragment dialog = new ResolveDialogFragment();
-            dialog.setOkListener(ARActivity.this::onResolveOkPressed);
+            dialog.setOkListener(PrivateARActivity.this::onResolveOkPressed);
             dialog.show(getSupportFragmentManager(), "Resolve");
 
-        }); */
-
-        fragment.setOnTapArPlaneListener(
-                (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
-
-                    if (plane.getType() != Plane.Type.HORIZONTAL_UPWARD_FACING ||
-                            appAnchorState != AppAnchorState.NONE) {
-                        return;
-                    }
-
-                    //Start progress bar
-                    progressBar.setVisibility(View.VISIBLE);
-                    progressText.setText(R.string.rendering_load);
-
-                    //If host is checked then create cloud anchor and host, otherwise just place
-                    //regular anchor.
-                    if(PreviewActivity.getChoice().equals("private")) {
-                        Anchor newAnchor = fragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor());
-                        setCloudAnchor(newAnchor);
-                        appAnchorState = AppAnchorState.HOSTING;
-                        placeObject(fragment, cloudAnchor, Uri.parse(url));
-                    } else if(PreviewActivity.getChoice().equals("public")) {
-                        Anchor newAnchor = fragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor());
-                        setCloudAnchor(newAnchor);
-                        appAnchorState = AppAnchorState.HOSTING;
-                        snackbarHelper.showMessage(this, "Now hosting anchor...");
-                        placeObject(fragment, cloudAnchor, Uri.parse(url));
-                    } else {
-                        Anchor newAnchor = hitResult.createAnchor();
-                        placeObject(fragment, newAnchor, Uri.parse(url));
-                    }
-
-                }
-        );
+        });
 
         progressBar = findViewById(R.id.progressBar_cyclic);
         progressBar.setVisibility(View.INVISIBLE);
@@ -177,6 +136,9 @@ public class ARActivity extends AppCompatActivity {
                     return null;
                 }));
 
+        progressBar.setVisibility(View.INVISIBLE);
+        progressText.setText("");
+
     }
 
 
@@ -197,14 +159,6 @@ public class ARActivity extends AppCompatActivity {
         node.setParent(anchorNode);
         fragment.getArSceneView().getScene().addChild(anchorNode);
         node.select();
-
-        if(!PreviewActivity.getChoice().equals("private")) {
-            //Remove progress bar once placed if it's not private.
-            progressBar.setVisibility(View.INVISIBLE);
-            progressText.setText("");
-        } else {
-            progressText.setText("Generating shareable code...");
-        }
     }
 
     /*Check if the anchor has finished hosting every time a frame is updated. To do this, we can
@@ -245,7 +199,7 @@ public class ARActivity extends AppCompatActivity {
                             ClipData clip = ClipData.newPlainText("code", code);
                             if (clipboard != null) {
                                 clipboard.setPrimaryClip(clip);
-                                Toast.makeText(ARActivity.this, "Copied to clipboard!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(PrivateARActivity.this, "Copied to clipboard!", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
@@ -279,6 +233,8 @@ public class ARActivity extends AppCompatActivity {
       our 3D object on the Resolved Anchor. It changes the appAnchorState to RESOLVING
     */
     private void onResolveOkPressed(String dialogValue){
+        progressBar.setVisibility(View.VISIBLE);
+        progressText.setText(R.string.rendering_load);
         int shortCode = Integer.parseInt(dialogValue);
         storageManager.getCloudAnchorID(shortCode,(cloudAnchorId) -> {
             Anchor resolvedAnchor = fragment.getArSceneView().getSession().resolveCloudAnchor(cloudAnchorId);

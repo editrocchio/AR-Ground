@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/sceneform_fragment"
+        android:name="com.choam.arground.CustomArFragment" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+          <Button
+               android:id="@+id/clear_button"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:text="Clear"
+               tools:ignore="ButtonStyle" />
+
+           <Button
+               android:id="@+id/resolve_button"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:text="Resolve"
+               tools:ignore="ButtonStyle" />
+
+
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar_cyclic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="50dp"
+        android:minWidth="50dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:id="@+id/progress_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/progressBar_cyclic"
+        android:layout_centerHorizontal="true"
+        android:textColor="#FFFFFF"
+        android:textSize="12pt"/>
+
+</RelativeLayout>

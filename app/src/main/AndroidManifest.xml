@@ -34,6 +34,7 @@
         <activity android:name="com.choam.arground.ARActivity" />
         <activity android:name="com.choam.arground.PolyAPICalls.PopulateAssetList"/>
         <activity android:name="com.choam.arground.PreviewActivity"/>
+        <activity android:name="com.choam.arground.PrivateARActivity"/>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/api_key" />
