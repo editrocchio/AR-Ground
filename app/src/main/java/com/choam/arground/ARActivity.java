@@ -81,7 +81,6 @@ public class ARActivity extends AppCompatActivity {
             onUpdateFrame();
         });
 
-        fragment.getPlaneDiscoveryController().hide();
 
        /* Button clearButton = findViewById(R.id.clear_button);
         clearButton.setOnClickListener(view -> setCloudAnchor(null));

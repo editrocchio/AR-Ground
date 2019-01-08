@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
-import com.choam.arground.Fragments.SearchFragment;
+import com.choam.arground.Fragments.ExploreFragment;
 import com.choam.arground.PreviewActivity;
 import com.choam.arground.R;
 
@@ -138,7 +138,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
             String url = params[0];
             //Send a GET request for the selected object only.
             HttpUrl.Builder httpBuilder = HttpUrl.parse(url).newBuilder();
-            httpBuilder.addQueryParameter("key", SearchFragment.API_KEY);
+            httpBuilder.addQueryParameter("key", ExploreFragment.API_KEY);
             Request request = new Request.Builder().url(httpBuilder.build()).build();
 
             try {

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 
 import android.util.Log;
@@ -35,26 +36,24 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class SearchFragment extends Fragment  {
+public class ExploreFragment extends Fragment  {
 
     public static final String API_KEY = BuildConfig.ApiKeyDebugPoly;
     public static final String BASE_URL = "https://poly.googleapis.com/v1/";
-    private static final String TAG = "SearchFragment";
+    private static final String TAG = "ExploreFragment";
     private ReceiveFeedTask receiveFeedTask;
     private EditText catEditTxt;
     private static String selectedCategory;
     private static String resultsPerPage;
 
-    //Pass this to PopulateAssetList so we can make more requests on scroll to bottom
-    private static HashMap<String, String> queryParams;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_search, container, false);
+        View view = inflater.inflate(R.layout.fragment_explore, container, false);
 
-        Button send = view.findViewById(R.id.btnSend);
+        FloatingActionButton send = view.findViewById(R.id.btnSend);
         catEditTxt = view.findViewById(R.id.search_assets);
         Spinner catSpinner = view.findViewById(R.id.category_spinner);
         Spinner resSpinner = view.findViewById(R.id.results_spinner);
