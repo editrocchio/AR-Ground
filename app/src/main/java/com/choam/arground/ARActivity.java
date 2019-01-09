@@ -63,7 +63,6 @@ public class ARActivity extends AppCompatActivity {
         url = i.getExtras().getString("gltfFileUrl");
 
         fragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
-        fragment.getPlaneDiscoveryController().setInstructionView(null);
         fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
             fragment.onUpdate(frameTime);
             onUpdateFrame();
@@ -109,12 +108,7 @@ public class ARActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance().getReference();
     }
 
-    //Ensures there's only one cloud anchor at a time.
     private void setCloudAnchor (Anchor newAnchor){
-        if (cloudAnchor != null){
-            cloudAnchor.detach();
-        }
-
         cloudAnchor = newAnchor;
         appAnchorState = AppAnchorState.NONE;
     }

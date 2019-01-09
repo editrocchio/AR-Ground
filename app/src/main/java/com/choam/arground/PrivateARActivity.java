@@ -13,9 +13,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.ar.core.Anchor;
+import com.google.ar.core.Config;
+import com.google.ar.core.Session;
 import com.google.ar.sceneform.AnchorNode;
+import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.assets.RenderableSource;
 import com.google.ar.sceneform.rendering.ModelRenderable;
+import com.google.ar.sceneform.rendering.PlaneRenderer;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
@@ -49,18 +53,18 @@ public class PrivateARActivity extends AppCompatActivity {
         Intent i = getIntent();
         shortCode = i.getExtras().getString("code");
 
-
         fragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
-        fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
-            fragment.onUpdate(frameTime);
-        });
+        fragment.getArSceneView().getPlaneRenderer().setEnabled(false);
+        fragment.getPlaneDiscoveryController().hide();
+        fragment.getPlaneDiscoveryController().setInstructionView(null);
+       // fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
+         //   fragment.onUpdate(frameTime);
+      //  });
 
         Button resolveButton = findViewById(R.id.resolve_button);
         resolveButton.setOnClickListener(view -> {
-            if (cloudAnchor != null){
-                return;
-            }
-            onResolveOkPressed();
+
+            onResolvePressed();
         });
 
         progressBar = findViewById(R.id.progressBar_cyclic);
@@ -70,12 +74,8 @@ public class PrivateARActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance().getReference();
     }
 
-    //Ensures there's only one cloud anchor at a time.
-    private void setCloudAnchor (Anchor newAnchor){
-        if (cloudAnchor != null){
-            cloudAnchor.detach();
-        }
 
+    private void setCloudAnchor (Anchor newAnchor){
         cloudAnchor = newAnchor;
     }
 
@@ -137,13 +137,15 @@ public class PrivateARActivity extends AppCompatActivity {
     /*This function takes the shortCode as the input, retrieves the resolved anchor, and places
       our 3D object on the Resolved Anchor. It changes the appAnchorState to RESOLVING
     */
-    private void onResolveOkPressed(){
+    private void onResolvePressed(){
         //Get the full code from firebase
         database.child(ANCHOR_NODE_NAME).child(ANCHOR_ID_START + shortCode)
                 .child("code").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                longCode = dataSnapshot.getValue().toString();
+                if(dataSnapshot.getValue() != null) {
+                    longCode = dataSnapshot.getValue().toString();
+                }
             }
 
             @Override
@@ -157,7 +159,9 @@ public class PrivateARActivity extends AppCompatActivity {
                 .child("url").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                url = dataSnapshot.getValue().toString();
+                if(dataSnapshot.getValue() != null) {
+                    url = dataSnapshot.getValue().toString();
+                }
             }
 
             @Override
