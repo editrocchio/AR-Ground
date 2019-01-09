@@ -8,21 +8,14 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
-import com.choam.arground.GoogleClasses.ResolveDialogFragment;
-import com.choam.arground.GoogleClasses.StorageManager;
-
-import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.choam.arground.GoogleClasses.SnackbarHelper;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
@@ -32,11 +25,8 @@ import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.Random;
 
@@ -55,11 +45,8 @@ public class ARActivity extends AppCompatActivity {
     }
 
     private AppAnchorState appAnchorState = AppAnchorState.NONE;
-    private SnackbarHelper snackbarHelper = new SnackbarHelper();
-    private StorageManager storageManager;
 
     private String url;
-
     private DatabaseReference database;
     private static final String ANCHOR_ID_START = "anchor:";
     private static final String ANCHOR_NODE_NAME = "cloud_anchors";
@@ -76,25 +63,12 @@ public class ARActivity extends AppCompatActivity {
         url = i.getExtras().getString("gltfFileUrl");
 
         fragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
+        fragment.getPlaneDiscoveryController().setInstructionView(null);
         fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
             fragment.onUpdate(frameTime);
             onUpdateFrame();
         });
 
-
-       /* Button clearButton = findViewById(R.id.clear_button);
-        clearButton.setOnClickListener(view -> setCloudAnchor(null));
-
-        Button resolveButton = findViewById(R.id.resolve_button);
-        resolveButton.setOnClickListener(view -> {
-            if (cloudAnchor != null){
-                snackbarHelper.showMessageWithDismiss(getParent(), "Please clear Anchor");
-                return;            }
-            ResolveDialogFragment dialog = new ResolveDialogFragment();
-            dialog.setOkListener(ARActivity.this::onResolveOkPressed);
-            dialog.show(getSupportFragmentManager(), "Resolve");
-
-        }); */
 
         fragment.setOnTapArPlaneListener(
                 (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
@@ -119,7 +93,6 @@ public class ARActivity extends AppCompatActivity {
                         Anchor newAnchor = fragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor());
                         setCloudAnchor(newAnchor);
                         appAnchorState = AppAnchorState.HOSTING;
-                        snackbarHelper.showMessage(this, "Now hosting anchor...");
                         placeObject(fragment, cloudAnchor, Uri.parse(url));
                     } else {
                         Anchor newAnchor = hitResult.createAnchor();
@@ -133,7 +106,6 @@ public class ARActivity extends AppCompatActivity {
         progressBar.setVisibility(View.INVISIBLE);
         progressText = findViewById(R.id.progress_text);
 
-        storageManager = new StorageManager(this);
         database = FirebaseDatabase.getInstance().getReference();
     }
 
@@ -145,7 +117,6 @@ public class ARActivity extends AppCompatActivity {
 
         cloudAnchor = newAnchor;
         appAnchorState = AppAnchorState.NONE;
-        snackbarHelper.hide(this);
     }
 
 
@@ -222,8 +193,7 @@ public class ARActivity extends AppCompatActivity {
         Anchor.CloudAnchorState cloudState = cloudAnchor.getCloudAnchorState();
         if (appAnchorState == AppAnchorState.HOSTING) {
             if (cloudState.isError()) {
-                snackbarHelper.showMessageWithDismiss(this, "Error hosting anchor.. "
-                        + cloudState);
+                Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show();
                 appAnchorState = AppAnchorState.NONE;
             } else if (cloudState == Anchor.CloudAnchorState.SUCCESS) {
                 //Only do this if we're hosting privately. Generate short code and show to user with
@@ -266,29 +236,13 @@ public class ARActivity extends AppCompatActivity {
 
         else if (appAnchorState == AppAnchorState.RESOLVING){
             if (cloudState.isError()) {
-                snackbarHelper.showMessageWithDismiss(this, "Error resolving anchor.. "
-                        + cloudState);
+                Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show();
                 appAnchorState = AppAnchorState.NONE;
             } else if (cloudState == Anchor.CloudAnchorState.SUCCESS){
-                snackbarHelper.showMessageWithDismiss(this, "Anchor resolved successfully");
                 appAnchorState = AppAnchorState.RESOLVED;
             }
         }
 
-    }
-
-    /*This function takes the shortCode as the input, retrieves the resolved anchor, and places
-      our 3D object on the Resolved Anchor. It changes the appAnchorState to RESOLVING
-    */
-    private void onResolveOkPressed(String dialogValue){
-        int shortCode = Integer.parseInt(dialogValue);
-        storageManager.getCloudAnchorID(shortCode,(cloudAnchorId) -> {
-            Anchor resolvedAnchor = fragment.getArSceneView().getSession().resolveCloudAnchor(cloudAnchorId);
-            setCloudAnchor(resolvedAnchor);
-            placeObject(fragment, cloudAnchor, Uri.parse(url));
-            snackbarHelper.showMessage(this, "Now Resolving Anchor...");
-            appAnchorState = AppAnchorState.RESOLVING;
-        });
     }
 
     /**

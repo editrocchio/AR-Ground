@@ -1,9 +1,5 @@
 package com.choam.arground;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,12 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.choam.arground.GoogleClasses.ResolveDialogFragment;
-import com.choam.arground.GoogleClasses.SnackbarHelper;
-import com.choam.arground.GoogleClasses.StorageManager;
-import com.choam.arground.PolyAPICalls.AssetAdapter;
 import com.google.ar.core.Anchor;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.assets.RenderableSource;
@@ -34,24 +25,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.Random;
-
 public class PrivateARActivity extends AppCompatActivity {
 
     private CustomArFragment fragment;
     private Anchor cloudAnchor;
-    //NONE by default, HOSTING when hosting the Anchor and HOSTED when the anchor is done hosting.
-    private enum AppAnchorState {
-        NONE,
-        HOSTING,
-        HOSTED,
-        RESOLVING,
-        RESOLVED
-    }
-
-    private AppAnchorState appAnchorState = AppAnchorState.NONE;
-    private SnackbarHelper snackbarHelper = new SnackbarHelper();
-    private StorageManager storageManager;
 
     private DatabaseReference database;
     private static final String ANCHOR_ID_START = "anchor:";
@@ -76,13 +53,11 @@ public class PrivateARActivity extends AppCompatActivity {
         fragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
         fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
             fragment.onUpdate(frameTime);
-            onUpdateFrame();
         });
 
         Button resolveButton = findViewById(R.id.resolve_button);
         resolveButton.setOnClickListener(view -> {
             if (cloudAnchor != null){
-                snackbarHelper.showMessageWithDismiss(getParent(), "Please clear Anchor");
                 return;
             }
             onResolveOkPressed();
@@ -92,7 +67,6 @@ public class PrivateARActivity extends AppCompatActivity {
         progressBar.setVisibility(View.INVISIBLE);
         progressText = findViewById(R.id.progress_text);
 
-        storageManager = new StorageManager(this);
         database = FirebaseDatabase.getInstance().getReference();
     }
 
@@ -103,8 +77,6 @@ public class PrivateARActivity extends AppCompatActivity {
         }
 
         cloudAnchor = newAnchor;
-        appAnchorState = AppAnchorState.NONE;
-        snackbarHelper.hide(this);
     }
 
 
@@ -136,9 +108,6 @@ public class PrivateARActivity extends AppCompatActivity {
                     return null;
                 }));
 
-        progressBar.setVisibility(View.INVISIBLE);
-        progressText.setText("");
-
     }
 
 
@@ -159,82 +128,16 @@ public class PrivateARActivity extends AppCompatActivity {
         node.setParent(anchorNode);
         fragment.getArSceneView().getScene().addChild(anchorNode);
         node.select();
+
+        progressBar.setVisibility(View.INVISIBLE);
+        progressText.setText("");
     }
 
-    /*Check if the anchor has finished hosting every time a frame is updated. To do this, we can
-      create a function onUpdateFrame. This function will call another function checkUpdatedAnchor
-      which will check the state of the anchor and update appAnchorState.
-    */
-    private void onUpdateFrame(){
-        checkUpdatedAnchor();
-    }
-
-    private synchronized void checkUpdatedAnchor(){
-        if (appAnchorState != AppAnchorState.HOSTING && appAnchorState != AppAnchorState.RESOLVING){
-            return;
-        }
-        Anchor.CloudAnchorState cloudState = cloudAnchor.getCloudAnchorState();
-        if (appAnchorState == AppAnchorState.HOSTING) {
-            if (cloudState.isError()) {
-                snackbarHelper.showMessageWithDismiss(this, "Error hosting anchor.. "
-                        + cloudState);
-                appAnchorState = AppAnchorState.NONE;
-            } else if (cloudState == Anchor.CloudAnchorState.SUCCESS) {
-                //Only do this if we're hosting privately. Generate short code and show to user with
-                //alert dialog. If it's public then we don't need to give user code.
-                if(PreviewActivity.getChoice().equals("private")) {
-                    String code = generateCode();
-                    //TODO: Check if code already exists in firebase
-                    database.child(ANCHOR_NODE_NAME).child(code).setValue(cloudAnchor.getCloudAnchorId());
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("Your shareable code is: " + code.substring(7));
-                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.dismiss();
-                        }
-                    });
-                    builder.setNegativeButton(R.string.copy, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                            ClipData clip = ClipData.newPlainText("code", code);
-                            if (clipboard != null) {
-                                clipboard.setPrimaryClip(clip);
-                                Toast.makeText(PrivateARActivity.this, "Copied to clipboard!", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-
-                    progressBar.setVisibility(View.INVISIBLE);
-                    progressText.setText("");
-
-                }
-
-                appAnchorState = AppAnchorState.HOSTED;
-            }
-        }
-
-        else if (appAnchorState == AppAnchorState.RESOLVING){
-            if (cloudState.isError()) {
-                snackbarHelper.showMessageWithDismiss(this, "Error resolving anchor.. "
-                        + cloudState);
-                appAnchorState = AppAnchorState.NONE;
-            } else if (cloudState == Anchor.CloudAnchorState.SUCCESS){
-                snackbarHelper.showMessageWithDismiss(this, "Anchor resolved successfully");
-                appAnchorState = AppAnchorState.RESOLVED;
-            }
-        }
-
-    }
 
     /*This function takes the shortCode as the input, retrieves the resolved anchor, and places
       our 3D object on the Resolved Anchor. It changes the appAnchorState to RESOLVING
     */
     private void onResolveOkPressed(){
-        progressBar.setVisibility(View.VISIBLE);
-        progressText.setText(R.string.rendering_load);
         //Get the full code from firebase
         database.child(ANCHOR_NODE_NAME).child(ANCHOR_ID_START + shortCode)
                 .child("code").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -264,31 +167,14 @@ public class PrivateARActivity extends AppCompatActivity {
         });
 
         if(longCode != null && url != null) {
+            progressBar.setVisibility(View.VISIBLE);
+            progressText.setText(R.string.rendering_load);
             Anchor resolvedAnchor = fragment.getArSceneView().getSession().resolveCloudAnchor(longCode);
             setCloudAnchor(resolvedAnchor);
             placeObject(fragment, cloudAnchor, Uri.parse(url));
-            snackbarHelper.showMessage(PrivateARActivity.this, "Now Resolving Anchor...");
-            appAnchorState = AppAnchorState.RESOLVING;
         } else {
             Log.d("PrivateAR", "something went wrong");
         }
-       /* storageManager.getCloudAnchorID(shortCode,(cloudAnchorId) -> {
-            Anchor resolvedAnchor = fragment.getArSceneView().getSession().resolveCloudAnchor(cloudAnchorId);
-            setCloudAnchor(resolvedAnchor);
-            placeObject(fragment, cloudAnchor, Uri.parse(AssetAdapter.getGltfFileUrl()));
-            snackbarHelper.showMessage(this, "Now Resolving Anchor...");
-            appAnchorState = AppAnchorState.RESOLVING;
-        }); */
     }
 
-    /**
-     * Generate a random 4 digit code for private cloud anchors.
-     * @return  Pseudo random 4 digit code (each digit between 0 and 10).
-     */
-    public String generateCode() {
-        Random r = new Random();
-
-        return ANCHOR_ID_START + r.nextInt(10) + r.nextInt(10) + r.nextInt(10)
-        + r.nextInt(10);
-    }
 }
