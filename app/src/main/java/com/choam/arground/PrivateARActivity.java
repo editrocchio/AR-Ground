@@ -13,13 +13,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.ar.core.Anchor;
-import com.google.ar.core.Config;
-import com.google.ar.core.Session;
 import com.google.ar.sceneform.AnchorNode;
-import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.assets.RenderableSource;
 import com.google.ar.sceneform.rendering.ModelRenderable;
-import com.google.ar.sceneform.rendering.PlaneRenderer;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
@@ -45,6 +41,8 @@ public class PrivateARActivity extends AppCompatActivity {
     private String longCode;
     private String url;
 
+    Button resolveButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,17 +59,17 @@ public class PrivateARActivity extends AppCompatActivity {
          //   fragment.onUpdate(frameTime);
       //  });
 
-        Button resolveButton = findViewById(R.id.resolve_button);
-        resolveButton.setOnClickListener(view -> {
+        database = FirebaseDatabase.getInstance().getReference();
+        getFireBaseData();
 
+        resolveButton = findViewById(R.id.resolve_button);
+        resolveButton.setOnClickListener(view -> {
             onResolvePressed();
         });
 
         progressBar = findViewById(R.id.progressBar_cyclic);
         progressBar.setVisibility(View.INVISIBLE);
         progressText = findViewById(R.id.progress_text);
-
-        database = FirebaseDatabase.getInstance().getReference();
     }
 
 
@@ -133,11 +131,7 @@ public class PrivateARActivity extends AppCompatActivity {
         progressText.setText("");
     }
 
-
-    /*This function takes the shortCode as the input, retrieves the resolved anchor, and places
-      our 3D object on the Resolved Anchor. It changes the appAnchorState to RESOLVING
-    */
-    private void onResolvePressed(){
+    private void getFireBaseData() {
         //Get the full code from firebase
         database.child(ANCHOR_NODE_NAME).child(ANCHOR_ID_START + shortCode)
                 .child("code").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -169,6 +163,9 @@ public class PrivateARActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void onResolvePressed(){
 
         if(longCode != null && url != null) {
             progressBar.setVisibility(View.VISIBLE);

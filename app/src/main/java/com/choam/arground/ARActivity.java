@@ -1,13 +1,17 @@
 package com.choam.arground;
 
+import android.Manifest;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
@@ -16,6 +20,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
@@ -35,6 +42,7 @@ public class ARActivity extends AppCompatActivity {
 
     private CustomArFragment fragment;
     private Anchor cloudAnchor;
+
     //NONE by default, HOSTING when hosting the Anchor and HOSTED when the anchor is done hosting.
     private enum AppAnchorState {
         NONE,
@@ -49,10 +57,14 @@ public class ARActivity extends AppCompatActivity {
     private String url;
     private DatabaseReference database;
     private static final String ANCHOR_ID_START = "anchor:";
-    private static final String ANCHOR_NODE_NAME = "cloud_anchors";
+    private static final String ANCHOR_NODE_NAME_PRIV = "cloud_anchors_private";
+    private static final String ANCHOR_NODE_NAME_PUB = "cloud_anchors_public";
 
     private ProgressBar progressBar;
     private TextView progressText;
+
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private Location lastLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +73,8 @@ public class ARActivity extends AppCompatActivity {
 
         Intent i = getIntent();
         url = i.getExtras().getString("gltfFileUrl");
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         fragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
         fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
@@ -83,16 +97,30 @@ public class ARActivity extends AppCompatActivity {
 
                     //If host is checked then create cloud anchor and host, otherwise just place
                     //regular anchor.
-                    if(PreviewActivity.getChoice().equals("private")) {
+                    if (PreviewActivity.getChoice().equals("private")) {
                         Anchor newAnchor = fragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor());
                         setCloudAnchor(newAnchor);
                         appAnchorState = AppAnchorState.HOSTING;
                         placeObject(fragment, cloudAnchor, Uri.parse(url));
-                    } else if(PreviewActivity.getChoice().equals("public")) {
+                    } else if (PreviewActivity.getChoice().equals("public")) {
+                        //Request permissions and then get the last location.
+                        if (ActivityCompat.checkSelfPermission(this,
+                                Manifest.permission.ACCESS_FINE_LOCATION)
+                                != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(this, new String[] {
+                                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                                    },
+                                    1);
+                            return;
+                        }
+                        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this,
+                                location -> lastLocation = location);
+
                         Anchor newAnchor = fragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor());
                         setCloudAnchor(newAnchor);
                         appAnchorState = AppAnchorState.HOSTING;
                         placeObject(fragment, cloudAnchor, Uri.parse(url));
+
                     } else {
                         Anchor newAnchor = hitResult.createAnchor();
                         placeObject(fragment, newAnchor, Uri.parse(url));
@@ -195,8 +223,8 @@ public class ARActivity extends AppCompatActivity {
                 if(PreviewActivity.getChoice().equals("private")) {
                     String code = generateCode();
                     //TODO: Check if code already exists in firebase
-                    database.child(ANCHOR_NODE_NAME).child(code).child("code").setValue(cloudAnchor.getCloudAnchorId());
-                    database.child(ANCHOR_NODE_NAME).child(code).child("url").setValue(url);
+                    database.child(ANCHOR_NODE_NAME_PRIV).child(code).child("code").setValue(cloudAnchor.getCloudAnchorId());
+                    database.child(ANCHOR_NODE_NAME_PRIV).child(code).child("url").setValue(url);
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setMessage("Your shareable code is: " + code.substring(7));
@@ -222,6 +250,9 @@ public class ARActivity extends AppCompatActivity {
                     progressBar.setVisibility(View.INVISIBLE);
                     progressText.setText("");
 
+                    //if public then set up markers on Google Map and save the coordinates to firebase
+                } else if(PreviewActivity.getChoice().equals("public")) {
+                    //TODO:this
                 }
 
                 appAnchorState = AppAnchorState.HOSTED;
