@@ -183,5 +183,4 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
         }
     }
 
-
 }

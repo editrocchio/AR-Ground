@@ -7,9 +7,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MotionEvent;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -19,17 +20,19 @@ import android.widget.Toast;
 import com.choam.arground.GoogleClasses.ResolveDialogFragment;
 import com.choam.arground.GoogleClasses.SnackbarHelper;
 import com.choam.arground.GoogleClasses.StorageManager;
+import com.choam.arground.PolyAPICalls.AssetAdapter;
 import com.google.ar.core.Anchor;
-import com.google.ar.core.HitResult;
-import com.google.ar.core.Plane;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.assets.RenderableSource;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Random;
 
@@ -50,8 +53,6 @@ public class PrivateARActivity extends AppCompatActivity {
     private SnackbarHelper snackbarHelper = new SnackbarHelper();
     private StorageManager storageManager;
 
-    private String url;
-
     private DatabaseReference database;
     private static final String ANCHOR_ID_START = "anchor:";
     private static final String ANCHOR_NODE_NAME = "cloud_anchors";
@@ -59,13 +60,18 @@ public class PrivateARActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private TextView progressText;
 
+    private String shortCode;
+    private String longCode;
+    private String url;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ar);
+        setContentView(R.layout.activity_private_ar);
 
         Intent i = getIntent();
-        url = i.getExtras().getString("code");
+        shortCode = i.getExtras().getString("code");
+
 
         fragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
         fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
@@ -73,19 +79,13 @@ public class PrivateARActivity extends AppCompatActivity {
             onUpdateFrame();
         });
 
-
-        Button clearButton = findViewById(R.id.clear_button);
-        clearButton.setOnClickListener(view -> setCloudAnchor(null));
-
         Button resolveButton = findViewById(R.id.resolve_button);
         resolveButton.setOnClickListener(view -> {
             if (cloudAnchor != null){
                 snackbarHelper.showMessageWithDismiss(getParent(), "Please clear Anchor");
-                return;            }
-            ResolveDialogFragment dialog = new ResolveDialogFragment();
-            dialog.setOkListener(PrivateARActivity.this::onResolveOkPressed);
-            dialog.show(getSupportFragmentManager(), "Resolve");
-
+                return;
+            }
+            onResolveOkPressed();
         });
 
         progressBar = findViewById(R.id.progressBar_cyclic);
@@ -232,17 +232,53 @@ public class PrivateARActivity extends AppCompatActivity {
     /*This function takes the shortCode as the input, retrieves the resolved anchor, and places
       our 3D object on the Resolved Anchor. It changes the appAnchorState to RESOLVING
     */
-    private void onResolveOkPressed(String dialogValue){
+    private void onResolveOkPressed(){
         progressBar.setVisibility(View.VISIBLE);
         progressText.setText(R.string.rendering_load);
-        int shortCode = Integer.parseInt(dialogValue);
-        storageManager.getCloudAnchorID(shortCode,(cloudAnchorId) -> {
-            Anchor resolvedAnchor = fragment.getArSceneView().getSession().resolveCloudAnchor(cloudAnchorId);
+        //Get the full code from firebase
+        database.child(ANCHOR_NODE_NAME).child(ANCHOR_ID_START + shortCode)
+                .child("code").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                longCode = dataSnapshot.getValue().toString();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        //Get the url of the object
+        database.child(ANCHOR_NODE_NAME).child(ANCHOR_ID_START + shortCode)
+                .child("url").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                url = dataSnapshot.getValue().toString();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        if(longCode != null && url != null) {
+            Anchor resolvedAnchor = fragment.getArSceneView().getSession().resolveCloudAnchor(longCode);
             setCloudAnchor(resolvedAnchor);
             placeObject(fragment, cloudAnchor, Uri.parse(url));
+            snackbarHelper.showMessage(PrivateARActivity.this, "Now Resolving Anchor...");
+            appAnchorState = AppAnchorState.RESOLVING;
+        } else {
+            Log.d("PrivateAR", "something went wrong");
+        }
+       /* storageManager.getCloudAnchorID(shortCode,(cloudAnchorId) -> {
+            Anchor resolvedAnchor = fragment.getArSceneView().getSession().resolveCloudAnchor(cloudAnchorId);
+            setCloudAnchor(resolvedAnchor);
+            placeObject(fragment, cloudAnchor, Uri.parse(AssetAdapter.getGltfFileUrl()));
             snackbarHelper.showMessage(this, "Now Resolving Anchor...");
             appAnchorState = AppAnchorState.RESOLVING;
-        });
+        }); */
     }
 
     /**

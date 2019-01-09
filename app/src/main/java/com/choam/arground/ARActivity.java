@@ -231,7 +231,9 @@ public class ARActivity extends AppCompatActivity {
                 if(PreviewActivity.getChoice().equals("private")) {
                     String code = generateCode();
                     //TODO: Check if code already exists in firebase
-                    database.child(ANCHOR_NODE_NAME).child(code).setValue(cloudAnchor.getCloudAnchorId());
+                    database.child(ANCHOR_NODE_NAME).child(code).child("code").setValue(cloudAnchor.getCloudAnchorId());
+                    database.child(ANCHOR_NODE_NAME).child(code).child("url").setValue(url);
+
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setMessage("Your shareable code is: " + code.substring(7));
                     builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -242,7 +244,7 @@ public class ARActivity extends AppCompatActivity {
                     builder.setNegativeButton(R.string.copy, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                            ClipData clip = ClipData.newPlainText("code", code);
+                            ClipData clip = ClipData.newPlainText("code", code.substring(7));
                             if (clipboard != null) {
                                 clipboard.setPrimaryClip(clip);
                                 Toast.makeText(ARActivity.this, "Copied to clipboard!", Toast.LENGTH_SHORT).show();
