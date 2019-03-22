@@ -32,7 +32,7 @@ public class PrivateARActivity extends AppCompatActivity {
 
     private DatabaseReference database;
     private static final String ANCHOR_ID_START = "anchor:";
-    private static final String ANCHOR_NODE_NAME = "cloud_anchors";
+    private static final String ANCHOR_NODE_NAME = "cloud_anchors_private";
 
     private ProgressBar progressBar;
     private TextView progressText;
@@ -139,6 +139,7 @@ public class PrivateARActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.getValue() != null) {
                     longCode = dataSnapshot.getValue().toString();
+
                 }
             }
 

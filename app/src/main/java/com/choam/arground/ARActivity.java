@@ -12,14 +12,18 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.choam.arground.Fragments.MapsFragment;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -64,7 +68,8 @@ public class ARActivity extends AppCompatActivity {
     private TextView progressText;
 
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private Location lastLocation;
+    private double currentLat;
+    private double currentLong;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,13 +113,22 @@ public class ARActivity extends AppCompatActivity {
                                 Manifest.permission.ACCESS_FINE_LOCATION)
                                 != PackageManager.PERMISSION_GRANTED) {
                             ActivityCompat.requestPermissions(this, new String[] {
-                                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                                    android.Manifest.permission.ACCESS_FINE_LOCATION
                                     },
                                     1);
                             return;
                         }
-                        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this,
-                                location -> lastLocation = location);
+                        fusedLocationProviderClient.getLastLocation()
+                                .addOnSuccessListener(this, location -> {
+                                    // Got last known location. In some rare situations this can be null.
+                                    if (location != null) {
+                                        currentLat = location.getLatitude();
+                                        currentLong = location.getLongitude();
+                                    } else {
+                                        Toast.makeText(getApplicationContext(), "Couldn't get location", Toast.LENGTH_LONG).show();
+                                    }
+                                });
+
 
                         Anchor newAnchor = fragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor());
                         setCloudAnchor(newAnchor);
@@ -228,19 +242,13 @@ public class ARActivity extends AppCompatActivity {
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setMessage("Your shareable code is: " + code.substring(7));
-                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.dismiss();
-                        }
-                    });
-                    builder.setNegativeButton(R.string.copy, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                            ClipData clip = ClipData.newPlainText("code", code.substring(7));
-                            if (clipboard != null) {
-                                clipboard.setPrimaryClip(clip);
-                                Toast.makeText(ARActivity.this, "Copied to clipboard!", Toast.LENGTH_SHORT).show();
-                            }
+                    builder.setPositiveButton(R.string.ok, (dialog, id) -> dialog.dismiss());
+                    builder.setNegativeButton(R.string.copy, (dialog, id) -> {
+                        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("code", code.substring(7));
+                        if (clipboard != null) {
+                            clipboard.setPrimaryClip(clip);
+                            Toast.makeText(ARActivity.this, "Copied to clipboard!", Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -252,7 +260,25 @@ public class ARActivity extends AppCompatActivity {
 
                     //if public then set up markers on Google Map and save the coordinates to firebase
                 } else if(PreviewActivity.getChoice().equals("public")) {
-                    //TODO:this
+
+                    database.child(ANCHOR_NODE_NAME_PUB).child("code").setValue(cloudAnchor.getCloudAnchorId());
+                    database.child(ANCHOR_NODE_NAME_PUB).child("url").setValue(url);
+                    database.child(ANCHOR_NODE_NAME_PUB).child("latitude").setValue(currentLat);
+                    database.child(ANCHOR_NODE_NAME_PUB).child("longitude").setValue(currentLong);
+
+                    Fragment fragment = new MapsFragment();
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.frame_container, fragment);
+                    transaction.addToBackStack(null);
+                    transaction.commit();
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage("Hosted... why not add a message to help others find it?");
+                    builder.setPositiveButton(R.string.ok, (dialog, id) -> dialog.dismiss()); //TODO: this
+                    builder.setNegativeButton("no", (dialog, id) -> dialog.dismiss());
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+
                 }
 
                 appAnchorState = AppAnchorState.HOSTED;
@@ -280,4 +306,5 @@ public class ARActivity extends AppCompatActivity {
         return ANCHOR_ID_START + r.nextInt(10) + r.nextInt(10) + r.nextInt(10)
         + r.nextInt(10);
     }
+
 }
