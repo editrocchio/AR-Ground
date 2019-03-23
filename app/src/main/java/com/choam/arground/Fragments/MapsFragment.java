@@ -1,11 +1,16 @@
 package com.choam.arground.Fragments;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.choam.arground.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -15,12 +20,19 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 
 public class MapsFragment extends Fragment {
 
     private MapView mMapView;
     private GoogleMap googleMap;
+    private DatabaseReference database;
+    private static final String ANCHOR_NODE_NAME_PUB = "cloud_anchors_public";
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -30,6 +42,8 @@ public class MapsFragment extends Fragment {
         mMapView.onCreate(savedInstanceState);
 
         mMapView.onResume(); // needed to get the map to display immediately
+
+        database = FirebaseDatabase.getInstance().getReference();
 
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
@@ -41,7 +55,16 @@ public class MapsFragment extends Fragment {
             googleMap = mMap;
 
             // For showing a move to my location button
-        //    googleMap.setMyLocationEnabled(true);
+            if (ActivityCompat.checkSelfPermission(rootView.getContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(), new String[] {
+                                android.Manifest.permission.ACCESS_FINE_LOCATION
+                        },
+                        1);
+                return;
+            }
+            googleMap.setMyLocationEnabled(true);
 
             // For dropping a marker at a point on the Map
             LatLng vancouver = new LatLng(49.2578263, -123.1939435);
@@ -51,6 +74,25 @@ public class MapsFragment extends Fragment {
             CameraPosition cameraPosition = new CameraPosition.Builder().target(vancouver).zoom(10).build();
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         });
+
+        database.child(ANCHOR_NODE_NAME_PUB)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                          try {
+                              setMarker(Double.parseDouble(snapshot.child("latitude").getValue().toString()),
+                                      Double.parseDouble(snapshot.child("longitude").getValue().toString()));
+                          } catch (NullPointerException e) {
+                              Toast.makeText(rootView.getContext(),
+                                      "An error occurred loading markers", Toast.LENGTH_SHORT).show();
+                          }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    }
+                });
 
         return rootView;
     }

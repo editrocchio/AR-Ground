@@ -36,6 +36,8 @@ import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -60,6 +62,8 @@ public class ARActivity extends AppCompatActivity {
 
     private String url;
     private DatabaseReference database;
+    private FirebaseAuth mAuth;
+    FirebaseUser currentUser;
     private static final String ANCHOR_ID_START = "anchor:";
     private static final String ANCHOR_NODE_NAME_PRIV = "cloud_anchors_private";
     private static final String ANCHOR_NODE_NAME_PUB = "cloud_anchors_public";
@@ -148,6 +152,8 @@ public class ARActivity extends AppCompatActivity {
         progressText = findViewById(R.id.progress_text);
 
         database = FirebaseDatabase.getInstance().getReference();
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
     }
 
     private void setCloudAnchor (Anchor newAnchor){
@@ -261,16 +267,16 @@ public class ARActivity extends AppCompatActivity {
                     //if public then set up markers on Google Map and save the coordinates to firebase
                 } else if(PreviewActivity.getChoice().equals("public")) {
 
-                    database.child(ANCHOR_NODE_NAME_PUB).child("code").setValue(cloudAnchor.getCloudAnchorId());
-                    database.child(ANCHOR_NODE_NAME_PUB).child("url").setValue(url);
-                    database.child(ANCHOR_NODE_NAME_PUB).child("latitude").setValue(currentLat);
-                    database.child(ANCHOR_NODE_NAME_PUB).child("longitude").setValue(currentLong);
+                    database.child(ANCHOR_NODE_NAME_PUB).child(cloudAnchor.getCloudAnchorId()).child("url").setValue(url);
+                    database.child(ANCHOR_NODE_NAME_PUB).child(cloudAnchor.getCloudAnchorId()).child("userId").setValue(currentUser.getUid());
+                    database.child(ANCHOR_NODE_NAME_PUB).child(cloudAnchor.getCloudAnchorId()).child("latitude").setValue(currentLat);
+                    database.child(ANCHOR_NODE_NAME_PUB).child(cloudAnchor.getCloudAnchorId()).child("longitude").setValue(currentLong);
 
-                    Fragment fragment = new MapsFragment();
+                /*    Fragment fragment = new MapsFragment();
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.frame_container, fragment);
+                    transaction.replace(R.id.frame_container, fragment, "public");
                     transaction.addToBackStack(null);
-                    transaction.commit();
+                    transaction.commit(); */
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setMessage("Hosted... why not add a message to help others find it?");
