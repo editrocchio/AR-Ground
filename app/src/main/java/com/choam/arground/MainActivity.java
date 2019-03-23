@@ -11,6 +11,7 @@ import android.view.MenuItem;
 
 import com.choam.arground.Fragments.ExploreFragment;
 import com.choam.arground.Fragments.LogFragment;
+import com.choam.arground.Fragments.MapsFragment;
 import com.choam.arground.Fragments.ProfileFragment;
 import com.choam.arground.Fragments.SettingsFragment;
 
@@ -31,6 +32,13 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        //if coming from public placement jump to map right away
+        String value = getIntent().getStringExtra("key");
+        if(value != null && value.equals("fromPublic")) {
+            Fragment f = new MapsFragment();
+            loadFragment(f);
+        }
 
     }
 

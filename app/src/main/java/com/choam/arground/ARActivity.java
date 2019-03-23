@@ -72,8 +72,8 @@ public class ARActivity extends AppCompatActivity {
     private TextView progressText;
 
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private double currentLat;
-    private double currentLong;
+    private static double currentLat;
+    private static double currentLong;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -211,12 +211,14 @@ public class ARActivity extends AppCompatActivity {
         fragment.getArSceneView().getScene().addChild(anchorNode);
         node.select();
 
-        if(!PreviewActivity.getChoice().equals("private")) {
+        if(PreviewActivity.getChoice().equals("noshare")) {
             //Remove progress bar once placed if it's not private.
             progressBar.setVisibility(View.INVISIBLE);
             progressText.setText("");
-        } else {
+        } else if(PreviewActivity.getChoice().equals("private")) {
             progressText.setText("Generating shareable code...");
+        } else if(PreviewActivity.getChoice().equals("public")) {
+            progressText.setText("Sending to the cloud...");
         }
     }
 
@@ -272,16 +274,24 @@ public class ARActivity extends AppCompatActivity {
                     database.child(ANCHOR_NODE_NAME_PUB).child(cloudAnchor.getCloudAnchorId()).child("latitude").setValue(currentLat);
                     database.child(ANCHOR_NODE_NAME_PUB).child(cloudAnchor.getCloudAnchorId()).child("longitude").setValue(currentLong);
 
-                /*    Fragment fragment = new MapsFragment();
-                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.frame_container, fragment, "public");
-                    transaction.addToBackStack(null);
-                    transaction.commit(); */
+                    progressBar.setVisibility(View.INVISIBLE);
+                    progressText.setText("");
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setMessage("Hosted... why not add a message to help others find it?");
-                    builder.setPositiveButton(R.string.ok, (dialog, id) -> dialog.dismiss()); //TODO: this
-                    builder.setNegativeButton("no", (dialog, id) -> dialog.dismiss());
+                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                    setContentView(R.layout.activity_main_t_field);
+                                }
+                            });
+                            builder.setNegativeButton("NO", (dialog, which) -> {
+                                //go back to main activity to open map
+                                Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                                i.putExtra("key", "fromPublic");
+                                startActivity(i);
+                            });
                     AlertDialog dialog = builder.create();
                     dialog.show();
 
