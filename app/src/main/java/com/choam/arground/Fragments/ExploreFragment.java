@@ -180,11 +180,14 @@ public class ExploreFragment extends Fragment  {
             //Parse the response to get required info for the last and add it to the PolyObject class.
             try {
                 for(int i=0; i<assets.length(); i++) {
-                    String name = assets.getJSONObject(i).getString("displayName");
-                    String authorName = assets.getJSONObject(i).getString("authorName");
-                    String assetURL = BASE_URL + assets.getJSONObject(i).getString("name");
-                    String thumbURL = assets.getJSONObject(i).getJSONObject("thumbnail").getString("url");
-                    PolyObject.addToPolyObjectList(new PolyObject(name, authorName, assetURL, thumbURL));
+                    String path = assets.getJSONObject(i).getJSONArray("formats").getJSONObject(0).getJSONObject("root").getString("relativePath");
+                    if(!path.contains(" ") && !path.contains("%20")) {
+                        String name = assets.getJSONObject(i).getString("displayName");
+                        String authorName = assets.getJSONObject(i).getString("authorName");
+                        String assetURL = BASE_URL + assets.getJSONObject(i).getString("name");
+                        String thumbURL = assets.getJSONObject(i).getJSONObject("thumbnail").getString("url");
+                        PolyObject.addToPolyObjectList(new PolyObject(name, authorName, assetURL, thumbURL));
+                    }
 
                 }
 
