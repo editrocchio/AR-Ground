@@ -63,9 +63,14 @@ public class ExploreFragment extends Fragment  {
         Button privateCodeButton = view.findViewById(R.id.private_cam);
         privateCodeButton.setOnClickListener(v -> {
             String code = codeInput.getText().toString();
-            Intent i = new Intent(view.getContext(), PrivateARActivity.class);
-            i.putExtra("code", code);
-            startActivity(i);
+            codeInput.setText("");
+            if(code.length()==4) {
+                Intent i = new Intent(view.getContext(), PrivateARActivity.class);
+                i.putExtra("code", code);
+                startActivity(i);
+            } else {
+                Toast.makeText(view.getContext(), "Enter 4 digit code", Toast.LENGTH_SHORT).show();
+            }
         });
 
         // Create an ArrayAdapter using the string array and a default spinner layout

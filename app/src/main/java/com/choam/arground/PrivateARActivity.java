@@ -7,12 +7,15 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.ar.core.Anchor;
+import com.google.ar.core.exceptions.NotTrackingException;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.assets.RenderableSource;
 import com.google.ar.sceneform.rendering.ModelRenderable;
@@ -171,11 +174,18 @@ public class PrivateARActivity extends AppCompatActivity {
         if(longCode != null && url != null) {
             progressBar.setVisibility(View.VISIBLE);
             progressText.setText(R.string.rendering_load);
-            Anchor resolvedAnchor = fragment.getArSceneView().getSession().resolveCloudAnchor(longCode);
-            setCloudAnchor(resolvedAnchor);
+            try {
+                Anchor resolvedAnchor = fragment.getArSceneView().getSession().resolveCloudAnchor(longCode);
+                setCloudAnchor(resolvedAnchor);
+            } catch (NotTrackingException e) {
+                Toast.makeText(this, "Camera tracking error.. try again", Toast.LENGTH_LONG).show();
+            }
             placeObject(fragment, cloudAnchor, Uri.parse(url));
         } else {
-            Log.d("PrivateAR", "something went wrong");
+            Toast t = Toast.makeText(this, "Code not found", Toast.LENGTH_SHORT);
+            t.setGravity(Gravity.CENTER, 0, 0);
+            t.show();
+            finish();
         }
     }
 

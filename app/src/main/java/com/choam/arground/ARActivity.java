@@ -5,21 +5,18 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 
-import android.support.v4.app.ActivityCompat;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.location.LocationServices;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
@@ -29,8 +26,11 @@ import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Random;
 
@@ -39,6 +39,8 @@ public class ARActivity extends AppCompatActivity {
 
     private CustomArFragment fragment;
     private Anchor cloudAnchor;
+    private String code;
+    private Context context = this;
 
     //NONE by default, HOSTING when hosting the Anchor and HOSTED when the anchor is done hosting.
     private enum AppAnchorState {
@@ -190,25 +192,45 @@ public class ARActivity extends AppCompatActivity {
                 //Only do this if we're hosting privately. Generate short code and show to user with
                 //alert dialog. If it's public then we don't need to give user code.
                 if(PreviewActivity.getChoice().equals("private")) {
-                    String code = generateCode();
-                    //TODO: Check if code already exists in firebase
-                    database.child(ANCHOR_NODE_NAME_PRIV).child(code).child("code").setValue(cloudAnchor.getCloudAnchorId());
-                    database.child(ANCHOR_NODE_NAME_PRIV).child(code).child("url").setValue(url);
+                    code = generateCode();
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("Your shareable code is: " + code.substring(7));
-                    builder.setPositiveButton(R.string.ok, (dialog, id) -> dialog.dismiss());
-                    builder.setNegativeButton(R.string.copy, (dialog, id) -> {
-                        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                        ClipData clip = ClipData.newPlainText("code", code.substring(7));
-                        if (clipboard != null) {
-                            clipboard.setPrimaryClip(clip);
-                            Toast.makeText(ARActivity.this, "Copied to clipboard!", Toast.LENGTH_SHORT).show();
+                    //regenerate code if it exists
+                    database.child(ANCHOR_NODE_NAME_PRIV).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            while(dataSnapshot.hasChild(code)) {
+                                System.out.println("fuq");
+                                code = generateCode();
+                            }
+
+                            database.child(ANCHOR_NODE_NAME_PRIV).child(code).child("code").setValue(cloudAnchor.getCloudAnchorId());
+                            database.child(ANCHOR_NODE_NAME_PRIV).child(code).child("url").setValue(url);
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            builder.setMessage("Your shareable code is: " + code.substring(7));
+                            builder.setPositiveButton(R.string.ok, (dialog, id) -> dialog.dismiss());
+                            builder.setNegativeButton(R.string.copy, (dialog, id) -> {
+                                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                                ClipData clip = ClipData.newPlainText("code", code.substring(7));
+                                if (clipboard != null) {
+                                    clipboard.setPrimaryClip(clip);
+                                    Toast.makeText(ARActivity.this, "Copied to clipboard!", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
                         }
                     });
 
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
+
+
 
                     progressBar.setVisibility(View.INVISIBLE);
                     progressText.setText("");
