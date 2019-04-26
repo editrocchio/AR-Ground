@@ -3,6 +3,7 @@ package com.choam.arground;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
@@ -28,8 +29,6 @@ public class PreviewActivity extends AppCompatActivity {
         //Set choice to the initial radio button choice
         if(radioGroup.getCheckedRadioButtonId() == R.id.share_priv) {
             choice = "private";
-        } else if(radioGroup.getCheckedRadioButtonId() == R.id.share_pub) {
-            choice = "public";
         } else {
             choice = "noshare";
         }
@@ -55,8 +54,6 @@ public class PreviewActivity extends AppCompatActivity {
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if(checkedId == R.id.share_priv) {
                 choice = "private";
-            } else if(checkedId == R.id.share_pub) {
-                choice = "public";
             } else {
                 choice = "noshare";
             }

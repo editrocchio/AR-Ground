@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -167,6 +168,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
                     if(currentFormat.getString("formatType").equals("GLTF2")) {
                         //get .gltf file details
                         gltfFileUrl = currentFormat.getJSONObject("root").getString("url");
+
                         break;
                     }
                 }

@@ -31,12 +31,6 @@
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/share_pub"
-            android:text="Share publicly"/>
-
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:id="@+id/share_priv"
             android:text="Share privately"/>
 

@@ -4,16 +4,12 @@ import android.Manifest;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -23,10 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.choam.arground.Fragments.MapsFragment;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
@@ -36,8 +29,6 @@ import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -62,18 +53,12 @@ public class ARActivity extends AppCompatActivity {
 
     private String url;
     private DatabaseReference database;
-    private FirebaseAuth mAuth;
-    FirebaseUser currentUser;
     private static final String ANCHOR_ID_START = "anchor:";
     private static final String ANCHOR_NODE_NAME_PRIV = "cloud_anchors_private";
-    private static final String ANCHOR_NODE_NAME_PUB = "cloud_anchors_public";
 
     private ProgressBar progressBar;
     private TextView progressText;
 
-    private FusedLocationProviderClient fusedLocationProviderClient;
-    private static double currentLat;
-    private static double currentLong;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,8 +67,6 @@ public class ARActivity extends AppCompatActivity {
 
         Intent i = getIntent();
         url = i.getExtras().getString("gltfFileUrl");
-
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         fragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
         fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
@@ -111,34 +94,6 @@ public class ARActivity extends AppCompatActivity {
                         setCloudAnchor(newAnchor);
                         appAnchorState = AppAnchorState.HOSTING;
                         placeObject(fragment, cloudAnchor, Uri.parse(url));
-                    } else if (PreviewActivity.getChoice().equals("public")) {
-                        //Request permissions and then get the last location.
-                        if (ActivityCompat.checkSelfPermission(this,
-                                Manifest.permission.ACCESS_FINE_LOCATION)
-                                != PackageManager.PERMISSION_GRANTED) {
-                            ActivityCompat.requestPermissions(this, new String[] {
-                                    android.Manifest.permission.ACCESS_FINE_LOCATION
-                                    },
-                                    1);
-                            return;
-                        }
-                        fusedLocationProviderClient.getLastLocation()
-                                .addOnSuccessListener(this, location -> {
-                                    // Got last known location. In some rare situations this can be null.
-                                    if (location != null) {
-                                        currentLat = location.getLatitude();
-                                        currentLong = location.getLongitude();
-                                    } else {
-                                        Toast.makeText(getApplicationContext(), "Couldn't get location", Toast.LENGTH_LONG).show();
-                                    }
-                                });
-
-
-                        Anchor newAnchor = fragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor());
-                        setCloudAnchor(newAnchor);
-                        appAnchorState = AppAnchorState.HOSTING;
-                        placeObject(fragment, cloudAnchor, Uri.parse(url));
-
                     } else {
                         Anchor newAnchor = hitResult.createAnchor();
                         placeObject(fragment, newAnchor, Uri.parse(url));
@@ -152,8 +107,6 @@ public class ARActivity extends AppCompatActivity {
         progressText = findViewById(R.id.progress_text);
 
         database = FirebaseDatabase.getInstance().getReference();
-        mAuth = FirebaseAuth.getInstance();
-        currentUser = mAuth.getCurrentUser();
     }
 
     private void setCloudAnchor (Anchor newAnchor){
@@ -182,11 +135,7 @@ public class ARActivity extends AppCompatActivity {
                 .build()
                 .thenAccept(renderable -> addNodeToScene(fragment, anchor, renderable))
                 .exceptionally((throwable -> {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage(throwable.getMessage())
-                            .setTitle("Error!");
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
+                    Toast.makeText(this, "Unable to load.. try again", Toast.LENGTH_LONG).show();
                     return null;
                 }));
 
@@ -217,8 +166,6 @@ public class ARActivity extends AppCompatActivity {
             progressText.setText("");
         } else if(PreviewActivity.getChoice().equals("private")) {
             progressText.setText("Generating shareable code...");
-        } else if(PreviewActivity.getChoice().equals("public")) {
-            progressText.setText("Sending to the cloud...");
         }
     }
 
@@ -265,35 +212,6 @@ public class ARActivity extends AppCompatActivity {
 
                     progressBar.setVisibility(View.INVISIBLE);
                     progressText.setText("");
-
-                    //if public then set up markers on Google Map and save the coordinates to firebase
-                } else if(PreviewActivity.getChoice().equals("public")) {
-
-                    database.child(ANCHOR_NODE_NAME_PUB).child(cloudAnchor.getCloudAnchorId()).child("url").setValue(url);
-                    database.child(ANCHOR_NODE_NAME_PUB).child(cloudAnchor.getCloudAnchorId()).child("userId").setValue(currentUser.getUid());
-                    database.child(ANCHOR_NODE_NAME_PUB).child(cloudAnchor.getCloudAnchorId()).child("latitude").setValue(currentLat);
-                    database.child(ANCHOR_NODE_NAME_PUB).child(cloudAnchor.getCloudAnchorId()).child("longitude").setValue(currentLong);
-
-                    progressBar.setVisibility(View.INVISIBLE);
-                    progressText.setText("");
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("Hosted... why not add a message to help others find it?");
-                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                    setContentView(R.layout.activity_main_t_field);
-                                }
-                            });
-                            builder.setNegativeButton("NO", (dialog, which) -> {
-                                //go back to main activity to open map
-                                Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                                i.putExtra("key", "fromPublic");
-                                startActivity(i);
-                            });
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
 
                 }
 
