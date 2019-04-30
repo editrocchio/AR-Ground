@@ -22,6 +22,8 @@
     <string name="view_private_object">View Private Object</string>
     <string name="enter_4_digit_code">Enter 4 digit code</string>
     <string name="open_camera">Open Camera</string>
+    <string name="help">Help</string>
+    <string name="get_models">Fetching models</string>
 
 
 </resources>

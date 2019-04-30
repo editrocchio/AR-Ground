@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,6 +42,7 @@ public class ExploreFragment extends Fragment  {
 
     public static final String API_KEY = BuildConfig.ApiKeyDebugPoly;
     public static final String BASE_URL = "https://poly.googleapis.com/v1/";
+    public static final String POLY_BASE_URL = "https://poly.google.com/view/";
     private static final String TAG = "ExploreFragment";
     private ReceiveFeedTask receiveFeedTask;
     private EditText catEditTxt;
@@ -53,6 +55,7 @@ public class ExploreFragment extends Fragment  {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_explore, container, false);
+
 
         FloatingActionButton send = view.findViewById(R.id.btnSend);
         catEditTxt = view.findViewById(R.id.search_assets);
@@ -129,6 +132,12 @@ public class ExploreFragment extends Fragment  {
         }
 
         @Override
+        protected void onPreExecute() {
+            Context c = context.get();
+            Toast.makeText(c, "Fetching models", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
         protected String doInBackground(String... params) {
             OkHttpClient httpClient = new OkHttpClient();
             String url =  BASE_URL + "assets/";
@@ -181,6 +190,7 @@ public class ExploreFragment extends Fragment  {
             try {
                 JSONObject res = new JSONObject(result);
                 assets = res.getJSONArray("assets");
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -202,6 +212,7 @@ public class ExploreFragment extends Fragment  {
                 e.printStackTrace();
             } catch (NullPointerException n) {
                 Toast.makeText(c, "Nothing found", Toast.LENGTH_SHORT).show();
+
             }
 
             //If there are any PolyObjects then start the PopulateAssetList class.
@@ -212,5 +223,4 @@ public class ExploreFragment extends Fragment  {
         }
 
     }
-
 }

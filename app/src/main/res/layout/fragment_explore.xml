@@ -3,7 +3,10 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimaryLight"
     >
+
+
 
         <android.support.design.card.MaterialCardView
             android:layout_width="match_parent"
@@ -164,5 +167,7 @@
             </LinearLayout>
 
         </android.support.design.card.MaterialCardView>
+
+
     </LinearLayout>
 

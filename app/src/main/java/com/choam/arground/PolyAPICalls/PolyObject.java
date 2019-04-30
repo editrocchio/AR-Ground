@@ -6,6 +6,7 @@ public class PolyObject {
     private String name;
     private String authorName;
     private String assetURL;
+    private String polyURL;
     private String thumbURL;
 
     private static ArrayList<PolyObject> polyObjects = new ArrayList<>();
@@ -39,6 +40,10 @@ public class PolyObject {
 
     public String getThumbURL() {
         return thumbURL;
+    }
+
+    public String getPolyURL() {
+        return polyURL;
     }
 
     public static void addToPolyObjectList(PolyObject polyObject) {

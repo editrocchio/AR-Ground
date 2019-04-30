@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
                     loadFragment(fragment);
                     return true;
                 case R.id.navigation_logs:
-                    actionBar.setTitle("About");
+                    actionBar.setTitle("Help");
                     fragment = new AboutFragment();
                     loadFragment(fragment);
                     return true;

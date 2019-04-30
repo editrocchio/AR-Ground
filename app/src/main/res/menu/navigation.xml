@@ -9,7 +9,7 @@
     <item
         android:id="@+id/navigation_logs"
         android:icon="@drawable/baseline_list_black_24dp"
-        android:title="@string/about"
+        android:title="@string/help"
         android:enabled="true"/>
 
 

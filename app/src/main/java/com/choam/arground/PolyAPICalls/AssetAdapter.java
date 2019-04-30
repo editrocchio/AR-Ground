@@ -23,6 +23,7 @@ import com.choam.arground.R;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -124,10 +125,8 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
 
     private static class GetAssetTask extends AsyncTask<String, Void, String> {
 
-        private static final String TAG = "GetAssetTask";
         private JSONArray formats;
         private WeakReference<Context> context;
-
 
         private GetAssetTask(Context context) {
             this.context = new WeakReference<>(context);
@@ -158,6 +157,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
             try {
                 JSONObject res = new JSONObject(result);
                 formats = res.getJSONArray("formats");
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }

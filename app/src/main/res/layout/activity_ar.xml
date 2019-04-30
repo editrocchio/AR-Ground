@@ -26,8 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/progressBar_cyclic"
         android:layout_centerHorizontal="true"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/black"
         android:textSize="12pt"/>
-
 
 </RelativeLayout>
