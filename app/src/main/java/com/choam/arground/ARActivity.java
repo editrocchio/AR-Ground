@@ -1,6 +1,5 @@
 package com.choam.arground;
 
-import android.Manifest;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -13,6 +12,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,6 +60,7 @@ public class ARActivity extends AppCompatActivity {
 
     private ProgressBar progressBar;
     private TextView progressText;
+    private Button backButton;
 
 
     @Override
@@ -86,8 +87,8 @@ public class ARActivity extends AppCompatActivity {
                     }
 
                     //Start progress bar
-                    progressBar.setVisibility(View.VISIBLE);
-                    progressText.setText(R.string.rendering_load);
+
+                    progressText.setText(R.string.rendering_load);progressBar.setVisibility(View.VISIBLE);
 
                     //If host is checked then create cloud anchor and host, otherwise just place
                     //regular anchor.
@@ -107,6 +108,10 @@ public class ARActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar_cyclic);
         progressBar.setVisibility(View.INVISIBLE);
         progressText = findViewById(R.id.progress_text);
+
+        backButton = findViewById(R.id.back_button_1);
+
+        backButton.setOnClickListener(v -> finish());
 
         database = FirebaseDatabase.getInstance().getReference();
     }

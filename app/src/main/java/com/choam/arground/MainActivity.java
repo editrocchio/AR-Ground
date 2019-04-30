@@ -22,8 +22,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         actionBar = getSupportActionBar();
-
         actionBar.setTitle("Explore");
+
         loadFragment(new ExploreFragment());
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
@@ -59,6 +59,22 @@ public class MainActivity extends AppCompatActivity {
         transaction.replace(R.id.frame_container, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        int T= getFragmentManager().getBackStackEntryCount();
+        if (getFragmentManager().getBackStackEntryCount() == 0) {
+            finish();
+        }
+        else if (getFragmentManager().getBackStackEntryCount() == 1) {
+            finish();
+        }
+        else {
+            String tr = getFragmentManager().getBackStackEntryAt(T-2).getName();
+            setTitle(tr);
+            getFragmentManager().popBackStack();
+        }
     }
 
 }

@@ -11,6 +11,19 @@
         android:id="@+id/sceneform_fragment"
         android:name="com.choam.arground.CustomArFragment" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/back_button_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/back_butt"
+            tools:ignore="ButtonStyle" />
+
+    </LinearLayout>
+
     <ProgressBar
         android:id="@+id/progressBar_cyclic"
         android:layout_width="wrap_content"

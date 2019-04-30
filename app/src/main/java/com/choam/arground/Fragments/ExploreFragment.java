@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,9 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.choam.arground.BuildConfig;
@@ -42,7 +39,6 @@ public class ExploreFragment extends Fragment  {
 
     public static final String API_KEY = BuildConfig.ApiKeyDebugPoly;
     public static final String BASE_URL = "https://poly.googleapis.com/v1/";
-    public static final String POLY_BASE_URL = "https://poly.google.com/view/";
     private static final String TAG = "ExploreFragment";
     private ReceiveFeedTask receiveFeedTask;
     private EditText catEditTxt;
@@ -55,8 +51,6 @@ public class ExploreFragment extends Fragment  {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_explore, container, false);
-
-
         FloatingActionButton send = view.findViewById(R.id.btnSend);
         catEditTxt = view.findViewById(R.id.search_assets);
         Spinner catSpinner = view.findViewById(R.id.category_spinner);
@@ -117,18 +111,15 @@ public class ExploreFragment extends Fragment  {
             receiveFeedTask.execute(catEditTxt.getText().toString());
         });
 
-
         return view;
     }
 
     private static class ReceiveFeedTask extends AsyncTask<String, Void, String> {
         private WeakReference<Context> context;
-        private WeakReference<View> view;
         private JSONArray assets;
 
         private ReceiveFeedTask(Context context, View view) {
             this.context = new WeakReference<>(context);
-            this.view = new WeakReference<>(view);
         }
 
         @Override
@@ -219,8 +210,6 @@ public class ExploreFragment extends Fragment  {
             if(PolyObject.getPolyObjects().size() > 0) {
                 c.startActivity(new Intent(c, PopulateAssetList.class));
             }
-
         }
-
     }
 }

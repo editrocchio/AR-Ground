@@ -1,8 +1,5 @@
 <resources>
     <string name="app_name">AR Ground</string>
-    <string name="title_home">Home</string>
-    <string name="title_map">Map</string>
-    <string name="title_settings">Settings</string>
     <string name="title_explore">Explore</string>
 
     <string name="category">Category</string>
@@ -15,8 +12,6 @@
     <string name="copy">Copy to Clipboard</string>
     <string name="results">Results</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="about">About</string>
     <string name="search_google_poly">Search Google Poly</string>
     <string name="view_private_object">View Private Object</string>
@@ -26,8 +21,28 @@
     <string name="get_models">Fetching models</string>
     <string name="not_shared">Not shared</string>
     <string name="shared">Shared</string>
-    <string name="back">Back</string>
+    <string name="back_butt">Back</string>
     <string name="next">Continue</string>
+    <string name="generate">Generate</string>
 
+    <string name="instructions_noshare">
+        In the camera view, hold the phone as flat/horizontal as possible to the ground and move the phone in a smooth, circular motion
+        following the guide. You should see a collection of dots appear after a few seconds which represent an anchor point for the model. Tap them
+        to render it.
+    </string>
+
+    <string name="instructions_share">
+        Select the share button and after rendering the model a shareable code will be generated. Another phone can enter
+        this code on the Explore screen. Point the camera in the general area and press resolve to render the model.
+        \n\nNote: Anchor points only last 24 hours due to AR limitations.
+    </string>
+
+    <string name="problems">
+        Dots not appearing: The app uses feature points to detect planes so the surface may be too reflective or smooth.
+        Try on another surface, or try backing out and in to the camera again.
+        \n\nModel not appearing: Some models are highly complex, depending on your phone\'s hardware they may cause issues or
+        not render properly. There are very large models which may be placed above your head, try looking up.
+    </string>
+    <string name="prob_tutle">Problems</string>
 
 </resources>

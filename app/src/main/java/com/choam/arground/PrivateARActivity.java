@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -44,7 +43,7 @@ public class PrivateARActivity extends AppCompatActivity {
     private String longCode;
     private String url;
 
-    Button resolveButton;
+    private Button backButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +64,7 @@ public class PrivateARActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance().getReference();
         getFireBaseData();
 
-        resolveButton = findViewById(R.id.resolve_button);
+        Button resolveButton = findViewById(R.id.resolve_button);
         resolveButton.setOnClickListener(view -> {
             onResolvePressed();
         });
@@ -73,6 +72,10 @@ public class PrivateARActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar_cyclic);
         progressBar.setVisibility(View.INVISIBLE);
         progressText = findViewById(R.id.progress_text);
+
+        backButton = findViewById(R.id.back_button_2);
+
+        backButton.setOnClickListener(v -> finish());
     }
 
 

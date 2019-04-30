@@ -50,7 +50,7 @@
         android:id="@+id/cancel_preview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/back"
+        android:text="@string/back_butt"
         tools:ignore="ButtonOrder" />
 
 
