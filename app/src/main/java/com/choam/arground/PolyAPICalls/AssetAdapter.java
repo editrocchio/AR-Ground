@@ -69,7 +69,7 @@ public class AssetAdapter extends RecyclerView.Adapter<AssetAdapter.ViewHolder> 
 
         // Set item views based on your views and data model
         TextView textView = viewHolder.nameTextView;
-        textView.setText(polyObject.getName() +  "\nAuthor: " + polyObject.getAuthorName());
+        textView.setText(polyObject.getName() +  "\nAuthor: " + polyObject.getAuthorName() + "\nLicense: Creative Commons CC-BY");
         Button chooseButton = viewHolder.chooseButton;
         ImageView assetPreview = viewHolder.assetPreview;
 

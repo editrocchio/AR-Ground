@@ -6,13 +6,16 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:id="@+id/thumbail_layout"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/colorPrimaryLight">
+
 
     <ImageView
         android:id="@+id/expand_thumbnail"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
+        android:layout_width="380dp"
+        android:layout_height="380dp"
         tools:ignore="ContentDescription" />
+
 
     <RadioGroup
         android:layout_width="wrap_content"
@@ -20,19 +23,19 @@
         android:background="#e0e0e0"
         android:id="@+id/share_radio_group"
         android:checkedButton="@+id/not_shared"
-        android:layout_marginTop="30dp">
+        android:padding="10dp">
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/not_shared"
-            android:text="Not shared"/>
+            android:text="@string/not_shared"/>
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/share_priv"
-            android:text="Share privately"/>
+            android:text="@string/shared"/>
 
         </RadioGroup>
 
@@ -40,13 +43,14 @@
         android:id="@+id/place_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Place in World" />
+        android:text="@string/next"
+        android:layout_marginTop="5dp"/>
 
     <Button
         android:id="@+id/cancel_preview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Cancel"
+        android:text="@string/back"
         tools:ignore="ButtonOrder" />
 
 

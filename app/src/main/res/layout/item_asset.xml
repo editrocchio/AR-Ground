@@ -5,9 +5,8 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="10dp"
     android:paddingBottom="10dp"
-
+    android:background="@color/colorPrimaryLight"
     >
 
     <TextView
@@ -16,14 +15,15 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_marginStart="10dp"
-        android:textColor="@color/black"/>
+        android:textColor="#FFFF"/>
 
     <ImageView
         android:id="@+id/asset_preview"
         tools:ignore="ContentDescription"
         android:layout_marginEnd="5dp"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content" />
+        android:layout_width="wrap_content"
+        android:paddingTop="10dp"/>
 
     <Button
         android:id="@+id/choose_button"
@@ -31,7 +31,8 @@
         android:layout_height="wrap_content"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="11dp"
         android:text="@string/select"
         android:textSize="12sp" />
 
