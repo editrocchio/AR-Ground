@@ -2,35 +2,9 @@
     <string name="app_name">AR Ground</string>
     <string name="title_home">Home</string>
     <string name="title_map">Map</string>
-    <string name="title_logs">Logs</string>
     <string name="title_settings">Settings</string>
     <string name="title_explore">Explore</string>
 
-    <string name="title_activity_log">LogActivity</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
-
-    <!-- Strings related to login -->
-    <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Login</string>
-    <string name="invalid_email">This email address is invalid</string>
-    <string name="invalid_password">Password is too short</string>
-    <string name="incorrect_password">Password is incorrect</string>
-    <string name="field_required">This field is required</string>
-    <string name="sign_up">Sign up</string>
-
-    <string name="email">Email</string>
-    <string name="login">Login</string>
-    <string name="create_account">No account yet? <b>Create one</b></string>
-    <string name="name">Username</string>
-    <string name="already_a_member_login">Already a member? <b>Login</b></string>
-    <string name="create_account_signup">Create Account</string>
-    <string name="gif_description">gif</string>
-    <string name="login_title_description">Title Image</string>
-    <string name="forgot_password">Forgot Password</string>
-    <string name="logout_btn">Logout</string>
-    <string name="email_password_reset_link">Reset Password</string>
-    <string name="joined">Joined: %1$s</string>
     <string name="category">Category</string>
     <string name="search">Search</string>
     <string name="search_term">Ex. Cats…</string>
@@ -43,6 +17,11 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="about">About</string>
+    <string name="search_google_poly">Search Google Poly</string>
+    <string name="view_private_object">View Private Object</string>
+    <string name="enter_4_digit_code">Enter 4 digit code</string>
+    <string name="open_camera">Open Camera</string>
 
 
 </resources>

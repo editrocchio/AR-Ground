@@ -10,7 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import com.choam.arground.Fragments.ExploreFragment;
-import com.choam.arground.Fragments.LogFragment;
+import com.choam.arground.Fragments.AboutFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
         actionBar = getSupportActionBar();
 
-        actionBar.setTitle("Home");
+        actionBar.setTitle("Explore");
         loadFragment(new ExploreFragment());
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
@@ -44,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
                     loadFragment(fragment);
                     return true;
                 case R.id.navigation_logs:
-                    actionBar.setTitle("Logs");
-                    fragment = new LogFragment();
+                    actionBar.setTitle("About");
+                    fragment = new AboutFragment();
                     loadFragment(fragment);
                     return true;
             }

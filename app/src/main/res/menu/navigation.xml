@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
-
     <item
         android:id="@+id/navigation_explore"
         android:icon="@drawable/baseline_explore_black_24dp"
@@ -11,7 +9,7 @@
     <item
         android:id="@+id/navigation_logs"
         android:icon="@drawable/baseline_list_black_24dp"
-        android:title="@string/title_logs"
+        android:title="@string/about"
         android:enabled="true"/>
 
 
