@@ -17,6 +17,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
@@ -67,6 +69,10 @@ public class ARActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ar);
+
+        AdView mAdView = findViewById(R.id.adView3);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         Intent i = getIntent();
         url = i.getExtras().getString("gltfFileUrl");
@@ -197,15 +203,14 @@ public class ARActivity extends AppCompatActivity {
                 //Only do this if we're hosting privately. Generate short code and show to user with
                 //alert dialog. If it's public then we don't need to give user code.
                 if(PreviewActivity.getChoice().equals("private")) {
-                    code = generateCode();
+                    code = randomAlphaNumeric(5);
 
                     //regenerate code if it exists
                     database.child(ANCHOR_NODE_NAME_PRIV).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             while(dataSnapshot.hasChild(code)) {
-                                System.out.println("fuq");
-                                code = generateCode();
+                                code = randomAlphaNumeric(5);
                             }
 
                             database.child(ANCHOR_NODE_NAME_PRIV).child(code).child("code").setValue(cloudAnchor.getCloudAnchorId());
@@ -257,15 +262,22 @@ public class ARActivity extends AppCompatActivity {
 
     }
 
-    /**
-     * Generate a random 4 digit code for private cloud anchors.
-     * @return  Pseudo random 4 digit code (each digit between 0 and 10).
-     */
-    public String generateCode() {
-        Random r = new Random();
 
-        return ANCHOR_ID_START + r.nextInt(10) + r.nextInt(10) + r.nextInt(10)
-        + r.nextInt(10);
+    private static final String ALPHA_NUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    /**
+     * Generate a random alpha numeric string whose length is the number of characters specified.
+     * Characters will be chosen from the set of alpha-numeric characters. Count is the length of
+     * random string to create.
+     */
+    public static String randomAlphaNumeric(int count) {
+        StringBuilder builder = new StringBuilder();
+        while (count-- != 0) {
+            int character = (int)(Math.random()*ALPHA_NUMERIC_STRING.length());
+            builder.append(ALPHA_NUMERIC_STRING.charAt(character));
+        }
+
+        return ANCHOR_ID_START + builder.toString();
+
     }
 
 }

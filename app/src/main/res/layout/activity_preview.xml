@@ -9,12 +9,24 @@
     android:orientation="vertical"
     android:background="@color/colorPrimaryLight">
 
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-3940256099942544/6300978111">
+    </com.google.android.gms.ads.AdView>
+
 
     <ImageView
         android:id="@+id/expand_thumbnail"
-        android:layout_width="380dp"
-        android:layout_height="380dp"
-        tools:ignore="ContentDescription" />
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        tools:ignore="ContentDescription"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:layout_margin="10dp"/>
 
 
     <RadioGroup
@@ -52,6 +64,9 @@
         android:layout_height="wrap_content"
         android:text="@string/back_butt"
         tools:ignore="ButtonOrder" />
+
+
+
 
 
 </LinearLayout>

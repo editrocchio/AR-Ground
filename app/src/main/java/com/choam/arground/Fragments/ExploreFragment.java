@@ -72,12 +72,12 @@ public class ExploreFragment extends Fragment  {
         privateCodeButton.setOnClickListener(v -> {
             String code = codeInput.getText().toString();
             codeInput.setText("");
-            if(code.length()==4) {
+            if(code.length()==5) {
                 Intent i = new Intent(view.getContext(), PrivateARActivity.class);
                 i.putExtra("code", code);
                 startActivity(i);
             } else {
-                Toast.makeText(view.getContext(), "Enter 4 digit code", Toast.LENGTH_SHORT).show();
+                Toast.makeText(view.getContext(), "Enter 5 character code", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -116,7 +116,7 @@ public class ExploreFragment extends Fragment  {
         });
 
         send.setOnClickListener(v -> {
-            receiveFeedTask = new ReceiveFeedTask(view.getContext(), view);
+            receiveFeedTask = new ReceiveFeedTask(view.getContext());
             receiveFeedTask.execute(catEditTxt.getText().toString());
         });
 
@@ -127,7 +127,7 @@ public class ExploreFragment extends Fragment  {
         private WeakReference<Context> context;
         private JSONArray assets;
 
-        private ReceiveFeedTask(Context context, View view) {
+        private ReceiveFeedTask(Context context) {
             this.context = new WeakReference<>(context);
         }
 
