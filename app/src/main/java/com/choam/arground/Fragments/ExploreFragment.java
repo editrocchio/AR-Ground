@@ -37,7 +37,7 @@ import okhttp3.Response;
 
 public class ExploreFragment extends Fragment  {
 
-    public static final String API_KEY = BuildConfig.ApiKeyDebugPoly;
+    public static final String API_KEY = BuildConfig.ApiKey;
     public static final String BASE_URL = "https://poly.googleapis.com/v1/";
     private static final String TAG = "ExploreFragment";
     private ReceiveFeedTask receiveFeedTask;
