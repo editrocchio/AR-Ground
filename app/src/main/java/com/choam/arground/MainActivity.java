@@ -11,9 +11,6 @@ import android.view.MenuItem;
 
 import com.choam.arground.Fragments.ExploreFragment;
 import com.choam.arground.Fragments.AboutFragment;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,8 +20,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        MobileAds.initialize(this, "ca-app-pub-3392098785053627~1516400807");
 
         actionBar = getSupportActionBar();
         actionBar.setTitle("Explore");

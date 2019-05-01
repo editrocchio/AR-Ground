@@ -13,8 +13,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.exceptions.NotTrackingException;
 import com.google.ar.sceneform.AnchorNode;
@@ -52,9 +50,6 @@ public class PrivateARActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_private_ar);
 
-        AdView mAdView = findViewById(R.id.adView4);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
 
         Intent i = getIntent();
         shortCode = i.getExtras().getString("code");

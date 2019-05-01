@@ -68,6 +68,5 @@ dependencies {
     //material text field
     implementation 'com.github.florent37:materialtextfield:1.0.7'
 
-    implementation 'com.google.firebase:firebase-ads:17.2.0'
 
 }

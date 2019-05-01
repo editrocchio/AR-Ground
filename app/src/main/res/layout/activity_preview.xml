@@ -9,16 +9,6 @@
     android:orientation="vertical"
     android:background="@color/colorPrimaryLight">
 
-    <com.google.android.gms.ads.AdView
-        xmlns:ads="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/adView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-3940256099942544/6300978111">
-    </com.google.android.gms.ads.AdView>
-
-
     <ImageView
         android:id="@+id/expand_thumbnail"
         android:layout_width="match_parent"

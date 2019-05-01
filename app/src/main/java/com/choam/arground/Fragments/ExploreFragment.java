@@ -23,8 +23,6 @@ import com.choam.arground.PolyAPICalls.PolyObject;
 import com.choam.arground.PolyAPICalls.PopulateAssetList;
 import com.choam.arground.PrivateARActivity;
 import com.choam.arground.R;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -55,10 +53,6 @@ public class ExploreFragment extends Fragment  {
 
 
         View view = inflater.inflate(R.layout.fragment_explore, container, false);
-
-        AdView mAdView = view.findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
 
         FloatingActionButton send = view.findViewById(R.id.btnSend);
         catEditTxt = view.findViewById(R.id.search_assets);
